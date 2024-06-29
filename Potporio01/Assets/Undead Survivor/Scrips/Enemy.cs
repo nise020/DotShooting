@@ -9,14 +9,16 @@ public class Enemy : MonoBehaviour
     GameManager gameManager;
     Vector3 moveDir;
     [SerializeField] float moveSpeed = 0.5f;
-    private Transform thisTransform;
+    private Transform mobTrnspos;
     private float beforeX;
+    CapsuleCollider2D mobCollider;
     private void Awake()
     {
         // transform 컴포넌트 명시적으로 초기화
-        thisTransform = transform;
+        mobTrnspos = transform;
         gameManager = FindObjectOfType<GameManager>();
-        beforeX = thisTransform.position.x;//기존에 x값 확인
+        beforeX = mobTrnspos.position.x;//기존에 x값 확인
+        mobCollider = GetComponent<CapsuleCollider2D>();
     }
 
 
@@ -25,9 +27,24 @@ public class Enemy : MonoBehaviour
         Mobmoving();
         seeCheack();
     }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+        {
+            Destroy(gameObject);
+        }
+    }
+    private void Atteak()
+    {
+        //임시기능
+        if (mobCollider.IsTouchingLayers(LayerMask.GetMask("Player")) == true) 
+        {
+            Destroy(gameObject);
+        }
+    }
 
 
-    
+
     /// <summary>
     /// 플레이어가 있는 방향으로 자동으로 이동합니다
     /// </summary>
@@ -42,9 +59,9 @@ public class Enemy : MonoBehaviour
         else 
         {
             gameManager.PlayerLocalPosiTion(out playerPos);//출력용
-            Vector3 distance = playerPos - thisTransform.position;
-            thisTransform.Translate(distance.normalized * moveSpeed * Time.deltaTime);
-            //Debug.Log($"{distans}");
+            Vector3 distance = playerPos - mobTrnspos.position;
+            mobTrnspos.Translate(distance.normalized * moveSpeed * Time.deltaTime);
+            //Debug.Log($"{distans}");//수정필요
 
         }
 
@@ -54,8 +71,8 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private void seeCheack()
     {
-        Vector3 scale = thisTransform.localScale;
-        float affterX = thisTransform.position.x;
+        Vector3 scale = mobTrnspos.localScale;
+        float affterX = mobTrnspos.position.x;
        
         if (affterX > beforeX)
         {

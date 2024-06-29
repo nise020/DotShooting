@@ -9,11 +9,13 @@ public class moveControll : MonoBehaviour
     [SerializeField] float moveSpeed = 2.0f;
     Vector3 moveDir;
     Animator anim;
+    CapsuleCollider2D playerCollider;
     
     // Start is called before the first frame update
     void Start()
     {
         anim = transform.GetComponent<Animator>();
+        playerCollider = GetComponent<CapsuleCollider2D>();
     }
 
     // Update is called once per frame
