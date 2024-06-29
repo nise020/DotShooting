@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     [Header("플레이어 위치")]
-    [SerializeField] public Transform targetTransform;
+    [SerializeField] public Transform trsTarget;
      Camera cam;
 
     [Header("몬스터 생성")]
@@ -33,14 +33,14 @@ public class GameManager : MonoBehaviour
     }
     private void Update()
     {
-        createEnemy();
+        //createEnemy();//활성화 필요
     }
     /// <summary>
     /// 플레이어가 움직여도 일정거리 밖에서 스폰하는 기능
     /// </summary>
     private void createEnemy()
     {
-        if (targetTransform == null) { return; }
+        if (trsTarget == null) { return; }
         //플레이어 위치 없을시
 
         mobSpawnTimer += Time.deltaTime;//타이머 ON
@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour
             int Iroad = Random.Range(0, 4);//스폰할 위치의 경계선 선정
             //Random.Range(1, 4)1,2,3 
 
-            Vector2 playerPos = targetTransform.position;//player 위치
+            Vector2 playerPos = trsTarget.position;//player 위치
             Vector2 done = new Vector2(0,0); //디폴트 생성
 
             float Randamx = Random.Range(-8.0f, 8.0f);//x값 랜덤위치 스폰
@@ -57,26 +57,26 @@ public class GameManager : MonoBehaviour
 
             if (Iroad == 0) //10
             {
-                plusMinas(playerPos.x);//음수를 정수로 전환
-                plusMinas(playerPos.y);//음수를 정수로 전환
+                PlusMinas(playerPos.x);//음수를 정수로 전환
+                PlusMinas(playerPos.y);//음수를 정수로 전환
                 done = new Vector2(createLine[0].x + playerPos.x, Randamy + playerPos.y);
             }
             else if (Iroad == 1)//-10
             {
-                plusMinas(playerPos.x);
-                plusMinas(playerPos.y);
+                PlusMinas(playerPos.x);
+                PlusMinas(playerPos.y);
                 done = new Vector2(createLine[1].x + playerPos.x, Randamy + playerPos.y);
             }
             else if (Iroad == 2)//7
             {
-                plusMinas(playerPos.x);
-                plusMinas(playerPos.y);
+                PlusMinas(playerPos.x);
+                PlusMinas(playerPos.y);
                 done = new Vector2(Randamx + playerPos.x, createLine[2].y + playerPos.y);
             }
             else//Iroad == 3//-7
             {
-                plusMinas(playerPos.x);
-                plusMinas(playerPos.y);
+                PlusMinas(playerPos.x);
+                PlusMinas(playerPos.y);
                 done = new Vector2(Randamx + playerPos.x, createLine[3].y + playerPos.y);
             }
             //done.x = Mathf.Clamp(done.x, -10, 10);
@@ -211,7 +211,12 @@ public class GameManager : MonoBehaviour
 
 
     }
-    private float plusMinas(float pos)//정수르르 내보내는 계산기
+    /// <summary>
+    /// 정수or음수를 정수로 전환
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns>정수</returns>
+    public float PlusMinas(float pos)//정수르르 내보내는 계산기
     {
         if (pos > 0) 
         {
@@ -230,7 +235,7 @@ public class GameManager : MonoBehaviour
     /// <param name="_pos"></param>
     public void PlayerLocalPosiTion(out Vector3 _pos)
     {
-        _pos = targetTransform.position;
+        _pos = trsTarget.position;
     }
 
 

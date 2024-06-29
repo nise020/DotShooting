@@ -14,7 +14,6 @@ public class Enemy : MonoBehaviour
     CapsuleCollider2D mobCollider;
     private void Awake()
     {
-        // transform 컴포넌트 명시적으로 초기화
         mobTrnspos = transform;
         gameManager = FindObjectOfType<GameManager>();
         beforeX = mobTrnspos.position.x;//기존에 x값 확인
@@ -52,7 +51,7 @@ public class Enemy : MonoBehaviour
     {
         Vector3 playerPos;
        
-        if (gameManager.targetTransform == null)//player가 죽었을 경우
+        if (gameManager.trsTarget == null)//player가 죽었을 경우
         {
             return;
         }
@@ -61,7 +60,7 @@ public class Enemy : MonoBehaviour
             gameManager.PlayerLocalPosiTion(out playerPos);//출력용
             Vector3 distance = playerPos - mobTrnspos.position;
             mobTrnspos.Translate(distance.normalized * moveSpeed * Time.deltaTime);
-            //Debug.Log($"{distans}");//수정필요
+            //Debug.Log($"{distance}");//수정필요
 
         }
 

@@ -10,12 +10,13 @@ public class moveControll : MonoBehaviour
     Vector3 moveDir;
     Animator anim;
     CapsuleCollider2D playerCollider;
-    
+    [SerializeField] Transform handScale;
+    //[SerializeField] Transform autoScale;오토 공격 상태
     // Start is called before the first frame update
     void Start()
     {
         anim = transform.GetComponent<Animator>();
-        playerCollider = GetComponent<CapsuleCollider2D>();
+        //playerCollider = GetComponent<CapsuleCollider2D>();
     }
 
     // Update is called once per frame
@@ -30,19 +31,22 @@ public class moveControll : MonoBehaviour
     /// </summary>
     private void seeCheack()
     {
-        Vector3 scale = transform.localScale;
-        if (Input.GetKeyDown(KeyCode.A) && scale.x != -1.0f)//-
+        Vector3 scale1 = transform.localScale;
+        Vector3 scale2 = handScale.localScale;
+        if (Input.GetKeyDown(KeyCode.A) && scale1.x != -1.0f)//-
         {
-            scale.x = -Mathf.Abs(scale.x);
+            scale1.x = -Mathf.Abs(scale1.x);
+            scale2.x = Mathf.Abs(scale2.x);
             //Debug.Log("왼");
         }
-        else if ((Input.GetKeyDown(KeyCode.D)) && scale.x != 1.0f)//+
+        else if ((Input.GetKeyDown(KeyCode.D)) && scale1.x != 1.0f)//+
         {
-            scale.x = Mathf.Abs(scale.x);
+            scale1.x = Mathf.Abs(scale1.x);
+            scale2.x = -Mathf.Abs(scale2.x);
             //Debug.Log("오");
         }
-        transform.localScale = scale;
-
+        transform.localScale = scale1;
+        handScale.localScale = scale2;
     }
 
     /// <summary>
