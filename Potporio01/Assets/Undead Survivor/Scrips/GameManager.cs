@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    //[Header("오브젝트 들")]
+
     public static GameManager Instance;
     [Header("플레이어 위치")]
     [SerializeField] public Transform trsTarget;
@@ -207,11 +209,11 @@ public class GameManager : MonoBehaviour
 
     }
     /// <summary>
-    /// 정수or음수를 정수로 전환
+    /// 정수를 내보내는 계산기
     /// </summary>
     /// <param name="pos"></param>
     /// <returns>정수</returns>
-    public float PlusMinas(float pos)//정수르르 내보내는 계산기
+    public float PlusMinas(float pos)
     {
         if (pos > 0) 
         {
@@ -228,7 +230,7 @@ public class GameManager : MonoBehaviour
     /// transform에 대한 정보를 밖으로 꺼낸다
     /// </summary>
     /// <param name="_pos"></param>
-    public void PlayerLocalPosiTion(out Vector3 _pos)
+    public void PlayerTrsPosiTion(out Vector3 _pos)
     {
         _pos = trsTarget.position;
     }

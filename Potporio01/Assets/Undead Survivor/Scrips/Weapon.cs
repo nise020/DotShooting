@@ -9,5 +9,9 @@ public class Weapon : MonoBehaviour
     {
         trsWeapon = GetComponent<Transform>();
     }
+    private void hit() 
+    {
+
+    }
     
 }

@@ -2,29 +2,49 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class moveControll : MonoBehaviour
 {
-
-    [SerializeField] float moveSpeed = 2.0f;
+    /// <summary>
+    /// 플레이어 이동속도(버프 부여 가능)
+    /// </summary>
+    [SerializeField] public static float moveSpeed = 2.0f;
     Vector3 moveDir;
     Animator anim;
-    CapsuleCollider2D playerCollider;
-    [Header("자동 공격 Scale")]
-    [SerializeField] Transform autoHandScale;
-    [SerializeField] Transform autoFabScale;//오토 공격 상태
+    CapsuleCollider2D cap2d;
+    Rigidbody2D rigid;
+    Vector2 moveVe2;
+    Transform trsPos;
+
+    //[Header("자동 공격 Scale")]
+    //[SerializeField] Transform autoHandScale;
+    //[SerializeField] Transform autoFabScale;//오토 공격 상태
     // Start is called before the first frame update
+    private void Awake()
+    {
+        if (trsPos == null)//시작 지점
+        {
+            trsPos = GetComponent<Transform>();
+            Vector3 trsPosStart = new Vector3(0,0,0);
+            transform.position = trsPosStart;
+        }
+    }
     void Start()
     {
+        rigid = GetComponent<Rigidbody2D>();
         anim = transform.GetComponent<Animator>();
-        //playerCollider = GetComponent<CapsuleCollider2D>();
+        cap2d = GetComponent<CapsuleCollider2D>();
     }
-
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        //Rigidbody2D 수치 조정
+    }
     // Update is called once per frame
     void Update()
     {
-        PlayerMoving();
-        RunAnim();
+        playerMoving();
+        runAnim();
         seeCheack();
     }
     /// <summary>
@@ -33,46 +53,39 @@ public class moveControll : MonoBehaviour
     private void seeCheack()
     {
         Vector3 scale1 = transform.localScale;
-        Vector3 scale2 = autoHandScale.localScale;
-        Vector3 scale3 = autoFabScale.localScale;
         if (Input.GetKeyDown(KeyCode.A) &&
             scale1.x != -1.0f && scale1.x == 1.0f)//왼
         {
             scale1.x = -Mathf.Abs(scale1.x);
-            //scale2.x = Mathf.Abs(scale2.x);
-            //scale3.x = Mathf.Abs(scale1.x);
-            scale3.x = scale1.x;
-            //Debug.Log("왼");
         }
         else if ((Input.GetKeyDown(KeyCode.D)) && 
             scale1.x != 1.0f && scale1.x == -1.0f)//오
         {
             scale1.x = Mathf.Abs(scale1.x);
-            //scale2.x = -Mathf.Abs(scale2.x);
-            //scale3.x = Mathf.Abs(scale1.x);
-            scale3.x = scale1.x;
-            //Debug.Log("오");
         }
         transform.localScale = scale1;
-        autoHandScale.localScale = scale2;
-        autoFabScale.localScale = scale3;
+
     }
 
     /// <summary>
     /// 방향키 입력시 움직이는 기능
     /// </summary>
-    private void PlayerMoving()
+    private void playerMoving()//움직임 조절 가능
     {
         moveDir.x = Input.GetAxisRaw("Horizontal");// -1 0 1
         moveDir.y = Input.GetAxisRaw("Vertical");// -1 0 1
 
         transform.position += moveDir * moveSpeed * Time.deltaTime;
+        //참고용
+        //moveDir.y = rigid.velocity.y;
+        //rigid.velocity = moveDir;
+
     }
 
     /// <summary>
     /// bool 형식을 사용해서 상하좌우로 입력시 애니메이션 실행
     /// </summary>
-    private void RunAnim() 
+    private void runAnim() 
     {
         if (moveDir.x != 0)
         {
