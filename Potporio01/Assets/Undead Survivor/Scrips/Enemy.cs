@@ -59,6 +59,7 @@ public class Enemy : MonoBehaviour
         {
             gameManager.PlayerLocalPosiTion(out playerPos);//출력용
             Vector3 distance = playerPos - mobTrnspos.position;
+            distance.z = 1.0f;
             mobTrnspos.Translate(distance.normalized * moveSpeed * Time.deltaTime);
             //Debug.Log($"{distance}");//수정필요
 

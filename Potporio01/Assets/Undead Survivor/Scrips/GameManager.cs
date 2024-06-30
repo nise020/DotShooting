@@ -1,10 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEngine.XR;
-using static UnityEngine.GraphicsBuffer;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,7 +12,6 @@ public class GameManager : MonoBehaviour
     [Header("몬스터 생성")]
     [SerializeField] List<GameObject> mobList;
     [SerializeField] Transform CreatTab;
-    [SerializeField] Transform CameraPosition;
     [SerializeField] List<Vector2> createLine;
     private bool isSpawn = false;
 
@@ -33,7 +28,7 @@ public class GameManager : MonoBehaviour
     }
     private void Update()
     {
-        //createEnemy();//활성화 필요
+        createEnemy();//활성화 필요
     }
     /// <summary>
     /// 플레이어가 움직여도 일정거리 밖에서 스폰하는 기능
