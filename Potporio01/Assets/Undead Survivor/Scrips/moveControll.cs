@@ -38,7 +38,7 @@ public class moveControll : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        //Rigidbody2D 수치 조정
+        //몬스터 콜라이다 닿으면 기능
     }
     // Update is called once per frame
     void Update()
@@ -79,6 +79,7 @@ public class moveControll : MonoBehaviour
         //참고용
         //moveDir.y = rigid.velocity.y;
         //rigid.velocity = moveDir;
+        //MovePosition()
 
     }
 
