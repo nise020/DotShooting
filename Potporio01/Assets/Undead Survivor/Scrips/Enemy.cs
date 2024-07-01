@@ -7,6 +7,7 @@ public class Enemy : MonoBehaviour
 {
     Weapon weapon;
     GameManager gameManager;
+    ItemManager itemManager;
     Vector3 moveDir;
     private Transform mobTrnspos;
     private float beforeX;
@@ -15,7 +16,7 @@ public class Enemy : MonoBehaviour
     [Header("몬스터 정보")]
     int HP = 1;//퍼블릭 전환 가능성 있음
     Animator anim;
-    float deathTime = 0.5f;
+    float deathTime = 0.3f;
     float deathTimer = 0.2f;
     [SerializeField] float moveSpeed = 0.5f;//몹 이동 속도
 
@@ -35,27 +36,33 @@ public class Enemy : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Weapon"))
         {
-            HP = HP - 1;
-            deathCheck();
+            //HP = HP - 1;
+            //death();
 
-            //deamageCheack();
+            deamageCheack();
         }
     }
+    /// <summary>
+    /// 데미지 계산
+    /// </summary>
     private void deamageCheack()
     {
-        Debug.Log(HP);
         int MaxHP = HP;
-        MaxHP = weapon.DamageNumber(MaxHP);//MaxHP - 5
+        //Debug.Log($"MaxHP = {MaxHP}");
+        MaxHP = weapon.DamageFigure(MaxHP);//MaxHP - 5
+        Debug.Log($"MaxHP = {MaxHP}");
         HP = MaxHP;
-        deathCheck();
     }
-    
+
+   /// <summary>
+   /// 사망한지 체크
+   /// </summary>
     private void deathCheck()
     {
-        if (HP <= 0)//사망시
+        if (HP <= 0)
         {
             anim.SetBool("Death", true);
-            deathTimer += Time.deltaTime;//애니메이션 재생시간
+            deathTimer += deathTimer * Time.deltaTime;//애니메이션 재생시간
             //Destroy(gameObject);
             if (deathTimer >= deathTime)
             {
@@ -63,12 +70,14 @@ public class Enemy : MonoBehaviour
                 deathTimer = 0.0f;
             }
         }
+        
     }
 
     private void Update()
     {
         Mobmoving();
         seeCheack();
+        deathCheck();
     }
 
 

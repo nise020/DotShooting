@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     //[Header("오브젝트 들")]
-
+    ItemManager itemManager;
     public static GameManager Instance;
     [Header("플레이어 위치")]
     [SerializeField] public Transform trsTarget;
@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
     }
     private void Update()
     {
-        createEnemy();//활성화 필요
+        //createEnemy();//활성화 필요
     }
     /// <summary>
     /// 플레이어가 움직여도 일정거리 밖에서 스폰하는 기능
@@ -84,6 +84,10 @@ public class GameManager : MonoBehaviour
 
             GameObject go = Instantiate(mobList[mobiRoad], done, Quaternion.identity, CreatTab);
             mobSpawnTimer = 0.0f;
+            if (go == null) 
+            {
+                //itemManager
+            }
             #region 일일히 예외처리 노가다
             //int count = 1;
             //for (int INum = 0; INum < count; INum++)

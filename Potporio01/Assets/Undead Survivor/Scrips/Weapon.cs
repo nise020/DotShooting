@@ -10,7 +10,7 @@ public class Weapon : MonoBehaviour
     private Vector2 upgraid;
     Transform trsWeapon;//검의 상태,크기조정
     Image image;//검의 스프라이트
-    public int WeaponDamage = 5;
+    public int WeaponDamage = 1;
     BoxCollider2D hiteEria;
 
     private void Awake()
@@ -23,17 +23,19 @@ public class Weapon : MonoBehaviour
     private void Update()
     {
         weaponScale();
-       // weaponUpgraid();
+        //weaponUpgraid();
+        //weaponPluse();
     }
+
 
     /// <summary>
     /// 데미지 계산기
     /// </summary>
     /// <param name="_iNum"></param>
     /// <returns>int _iNum</returns>
-    public int DamageNumber(int _iNum)
+    public int DamageFigure(int _iNum)
     {
-        _iNum -= WeaponDamage;//public int = 5(필드)
+        _iNum -= WeaponDamage;//public int = 1(필드)
         Debug.Log(_iNum);
         return _iNum;
     }
@@ -45,6 +47,15 @@ public class Weapon : MonoBehaviour
     {
 
     }
+
+    /// <summary>
+    /// 무기를 최대 4개까지 증식
+    /// </summary>
+    private void weaponPluse()
+    {
+
+    }
+
     /// <summary>
     /// 무기의 크기 증가
     /// </summary>

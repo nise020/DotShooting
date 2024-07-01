@@ -6,9 +6,11 @@ using UnityEngine;
 public class AutoWeaponDron : MonoBehaviour
 {
     [SerializeField] Transform trsAuto1;
+    //[SerializeField] Transform trsPlayer;
     //[SerializeField] Transform egoWeapon1;//πÃ¡§
 
-   
+    Transform trsPos;
+
 
     // Update is called once per frame
     void Update()
