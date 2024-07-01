@@ -25,7 +25,7 @@ public class PlayerStatas : MonoBehaviour
     /// <summary>
     /// 사망시 연출
     /// </summary>
-    private void death() 
+    private void death() //트리거 필요
     {
         if (HP == 0)//사망시
         {
