@@ -19,7 +19,7 @@ public class Weapon : MonoBehaviour
         trsWeapon = GetComponent<Transform>();
         hiteEria = GetComponent<BoxCollider2D>();
     }
-
+    
     private void Update()
     {
         weaponScale();

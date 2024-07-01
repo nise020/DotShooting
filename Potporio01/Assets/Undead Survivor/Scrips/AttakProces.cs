@@ -7,7 +7,7 @@ public class AttakProces : MonoBehaviour
 {
     Weapon Weapons;//무기 스테이터스 스크립트
     Transform playertransPos;
-    moveControll moving;
+    MoveControll moving;
     GameManager gameManager;
 
     [Header("자동 공격")]

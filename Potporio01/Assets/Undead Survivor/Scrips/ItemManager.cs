@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ItemManager : MonoBehaviour
@@ -9,23 +10,24 @@ public class ItemManager : MonoBehaviour
     [SerializeField] List <GameObject> ItemKind;//1.힐/2.이속증가//3.
     [SerializeField] GameObject Experience;//경험치
     [SerializeField] List<GameObject> Mobkind;//몹의 종류
-    //
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField, Range(0.0f, 100f)] float IteamProbability;//외부에서 조정 가능
+
+    private void Update()
     {
         
     }
 
-    // Update is called once per frame
-    void Update()
+    public void CreateItemCheck(Vector3 trs)
     {
-        CreateItem();
-    }
-
-    private void CreateItem()
-    {
-        if (ItemKind == null)//확률 부분
+        float randam = Random.Range(0.0f, 100f);
+        if (randam <= IteamProbability)//확률 부분
         {
+            int count = ItemKind.Count;
+            int Number = Random.Range(0, count);
+
+            GameObject go = Instantiate(ItemKind[Number],
+                trs, Quaternion.identity);
+
         }
     }
 }

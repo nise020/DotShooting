@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Item;
 
 public class GameManager : MonoBehaviour
 {
+    Enemy enemy;
+    Item item;
     //[Header("오브젝트 들")]
     ItemManager itemManager;
     public static GameManager Instance;
@@ -20,6 +23,12 @@ public class GameManager : MonoBehaviour
     [Header("적 생성시간")]
     float mobSpawnTimer = 0.0f;// 타이머
     [SerializeField, Range(0.1f, 5f)] float mobSpawnTime = 1.0f;
+
+    [Header("아이템 확률")]
+    [SerializeField] List <GameObject> ItemKind;//아이템 종류
+    [SerializeField, Range(0.0f, 100f)] float IteamProbability;//외부에서 조정 가능
+    bool imItem = false;//아이템 생성 여부
+
     private void Awake()
     {
         if (Instance == null)
@@ -30,7 +39,8 @@ public class GameManager : MonoBehaviour
     }
     private void Update()
     {
-        //createEnemy();//활성화 필요
+        createEnemy();//활성화 필요
+        check();
     }
     /// <summary>
     /// 플레이어가 움직여도 일정거리 밖에서 스폰하는 기능
@@ -84,10 +94,6 @@ public class GameManager : MonoBehaviour
 
             GameObject go = Instantiate(mobList[mobiRoad], done, Quaternion.identity, CreatTab);
             mobSpawnTimer = 0.0f;
-            if (go == null) 
-            {
-                //itemManager
-            }
             #region 일일히 예외처리 노가다
             //int count = 1;
             //for (int INum = 0; INum < count; INum++)
@@ -209,9 +215,30 @@ public class GameManager : MonoBehaviour
             #endregion
         }
         
-
+    }
+    private void check() 
+    {
 
     }
+    /// <summary>
+    /// 아이템 생성 확률 계산기
+    /// </summary>
+    /// <param name="trs"></param>
+    public void CreateItemCheck(Vector3 trs)//정상
+    {
+        float randam = Random.Range(0.0f, 100f);
+        if (randam <= IteamProbability)//확률 부분
+        {
+            int count = ItemKind.Count;
+            int Number = Random.Range(0, count);
+
+            GameObject go = Instantiate(ItemKind[Number],
+                trs, Quaternion.identity);
+
+        }
+    }
+
+
     /// <summary>
     /// 정수를 내보내는 계산기
     /// </summary>

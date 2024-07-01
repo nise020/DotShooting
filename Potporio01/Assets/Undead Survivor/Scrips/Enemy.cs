@@ -9,26 +9,27 @@ public class Enemy : MonoBehaviour
     GameManager gameManager;
     ItemManager itemManager;
     Vector3 moveDir;
-    private Transform mobTrnspos;
+    Transform MobTrnspos;
     private float beforeX;
     CapsuleCollider2D mobCollider;
 
     [Header("몬스터 정보")]
-    int HP = 1;//퍼블릭 전환 가능성 있음
+    public int HP = 1;//퍼블릭 전환 가능성 있음
     Animator anim;
     float deathTime = 0.3f;
     float deathTimer = 0.2f;
     [SerializeField] float moveSpeed = 0.5f;//몹 이동 속도
+    public bool Mobnull = false; 
 
 
     private void Awake()
     {
-        mobTrnspos = transform;
+        MobTrnspos = transform;
         gameManager = FindObjectOfType<GameManager>();
         //지우면 ㄴㄴ
         //public 상태의 변수를 참을수 있음
         //자동 완성 기능으로 써짐
-        beforeX = mobTrnspos.position.x;//기존에 x값 확인
+        beforeX = MobTrnspos.position.x;//기존에 x값 확인
         mobCollider = GetComponent<CapsuleCollider2D>();
         anim = GetComponent<Animator>();
     }
@@ -36,22 +37,23 @@ public class Enemy : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Weapon"))
         {
-            //HP = HP - 1;
-            //death();
+            HP = HP - 1;
+            deathCheck();
 
-            deamageCheack();
+            //deamageCheack();
         }
     }
     /// <summary>
     /// 데미지 계산
     /// </summary>
-    private void deamageCheack()
+    private void deamageCheack()//<-class Enemy
     {
-        int MaxHP = HP;
-        //Debug.Log($"MaxHP = {MaxHP}");
-        MaxHP = weapon.DamageFigure(MaxHP);//MaxHP - 5
-        Debug.Log($"MaxHP = {MaxHP}");
-        HP = MaxHP;
+        //int MaxHP = HP;//1
+        HP = HP - weapon.WeaponDamage;//class.public int = 1
+        return;
+        //HP = MaxHP;
+        deathCheck();//if (HP <= 0)
+        //이 부분은 잘 작동 합니다
     }
 
    /// <summary>
@@ -62,13 +64,16 @@ public class Enemy : MonoBehaviour
         if (HP <= 0)
         {
             anim.SetBool("Death", true);
-            deathTimer += deathTimer * Time.deltaTime;//애니메이션 재생시간
+            deathTimer += Time.deltaTime;//애니메이션 재생시간
             //Destroy(gameObject);
             if (deathTimer >= deathTime)
             {
                 Destroy(gameObject);
+                Mobnull = true;
                 deathTimer = 0.0f;
+                gameManager.CreateItemCheck(transform.position);
             }
+            Mobnull = false ;//위치 조정 필요
         }
         
     }
@@ -104,14 +109,14 @@ public class Enemy : MonoBehaviour
        
         if (gameManager.trsTarget == null)//player가 죽었을 경우
         {
-            return;
+            MobTrnspos = transform;
         }
         else 
         {
             gameManager.PlayerTrsPosiTion(out playerPos);//출력용
-            Vector3 distance = playerPos - mobTrnspos.position;
+            Vector3 distance = playerPos - MobTrnspos.position;
             distance.z = 0.0f;
-            mobTrnspos.Translate(distance.normalized * moveSpeed * Time.deltaTime);
+            MobTrnspos.Translate(distance.normalized * moveSpeed * Time.deltaTime);
             //Debug.Log($"{distance}");//수정필요
 
         }
@@ -122,8 +127,8 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private void seeCheack()
     {
-        Vector3 scale = mobTrnspos.localScale;
-        float affterX = mobTrnspos.position.x;
+        Vector3 scale = MobTrnspos.localScale;
+        float affterX = MobTrnspos.position.x;
        
         if (affterX > beforeX)
         {
