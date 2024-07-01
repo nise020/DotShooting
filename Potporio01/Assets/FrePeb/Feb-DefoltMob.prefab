@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6489319944882905969}
   - component: {fileID: 6956840005411605861}
   - component: {fileID: 3677177646647596374}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Feb-DefoltMob
   m_TagString: Untagged
   m_Icon: {fileID: 0}

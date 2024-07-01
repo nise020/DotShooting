@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 71722709741334953}
   - component: {fileID: 2244474034806450331}
   - component: {fileID: 1884889390319801528}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48,7 +48,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d5337d8dc220c94aaa8da0d554171b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 2
 --- !u!212 &7722512913131194909
 SpriteRenderer:
   m_ObjectHideFlags: 0

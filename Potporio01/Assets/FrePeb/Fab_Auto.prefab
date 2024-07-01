@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 981560624851834554}
   - component: {fileID: 3175248602926975308}
   - component: {fileID: 6287575239184163815}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: Fab_Auto
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33,7 +33,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!212 &4710740473312454961
 SpriteRenderer:
@@ -171,3 +171,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f921fcb8e658bc94593a430ec689b7ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponScaleCheack: 0
+  WeaponDamage: 1

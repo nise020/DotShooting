@@ -92,7 +92,7 @@ public class AttakProces : MonoBehaviour
                 (playertransPos.localScale.x == -1))//Scale
             {
                 autoHandRoT.rotation = tRoDefolt * Defolt;
-                Debug.Log(autoHandRoT.rotation.z);
+                //Debug.Log(autoHandRoT.rotation.z);
                 //Debug.Log(tRoDefolt);
             }
             //Debug.Log(autoHandRoT.rotation.z);

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveAutoDron : MonoBehaviour
+public class AutoWeaponDron : MonoBehaviour
 {
     [SerializeField] Transform trsAuto1;
     //[SerializeField] Transform egoWeapon1;//πÃ¡§

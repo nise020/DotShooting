@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2916456548492315425}
   - component: {fileID: 6832092617293718821}
   - component: {fileID: 5084442864910248426}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Feb-ScullMob
   m_TagString: Untagged
   m_Icon: {fileID: 0}
