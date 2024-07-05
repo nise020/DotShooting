@@ -5,19 +5,22 @@ using UnityEngine;
 
 public class MoveDron : MonoBehaviour
 {
+    PlayerStatas playerStatas;
     [SerializeField] Transform trsCam;
+    [SerializeField] GameObject playerObj;
 
-
+    private void Start()
+    {
+        playerStatas = playerObj.GetComponent<PlayerStatas>();
+    }
     void Update()
     {
-
-        Vector3 fixpos = trsCam.position;
-        fixpos.z = transform.position.z;
-        transform.position = fixpos;
+        Camera();
     }
 
     private void Camera()
     {
+        if (playerObj == null) { return; }
         Vector3 fixpos = trsCam.position;
         fixpos.z = transform.position.z;
         transform.position = fixpos;

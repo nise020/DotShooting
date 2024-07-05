@@ -6,74 +6,74 @@ using UnityEngine;
 public class AttakProces : MonoBehaviour
 {
     Weapon Weapons;//무기 스테이터스 스크립트
+    Enemy enemy;//몹
     Transform playertransPos;
     MoveControll moving;
     GameManager gameManager;
+    //Bullet bullet;
 
     [Header("자동 공격")]
     [SerializeField] bool autoCheack = false;//확인용
-    [SerializeField] float autoTime = 3.0f;
-    float autoTimer = 0.0f;
+    float autoTime = 3f;
+    float autoTimer = 0f;
+    float AutocoolTime = 5f;
+    float AutocoolTimer = 0f;
     float autoSpeed = 0.5f;
     float autoAngle = 360.0f;
     [SerializeField] Transform autoHandRoT;
 
-    [Header("무기 종류")]
-    [SerializeField] GameObject autoObj1;//기본 무기(무기 렙업시 이미지 전환)
-    [SerializeField] GameObject autoObj2;//무기 증식 1렙
-    [SerializeField] GameObject autoObj3;//무기 증식 2렙
-    [SerializeField] GameObject autoObj4;//무기 증식 3렙
+    [Header("검 종류")]
+    [SerializeField] List<GameObject> autoObj;//기본 무기(무기 렙업시 이미지 전환)
+    //[SerializeField] GameObject autoObj2;//무기 증식 1렙
+    //[SerializeField] GameObject autoObj3;//무기 증식 2렙
+    //[SerializeField] GameObject autoObj4;//무기 증식 3렙
 
-    [Header("수동 공격")]//없앨까 고민중
-    [SerializeField] bool manulCheack = false;
-    [SerializeField] Transform manulHandPos;
-    [SerializeField] GameObject manulObj;
-    Quaternion beForemanulHand;
-    float manulcoolTime = 0.5f;
-    float manulcoolTimer = 0.0f;
+    [Header("총알 공격")]
+    [SerializeField] List<GameObject> bulletKind;//총알 종류
+    [SerializeField] Transform creatTab;//총알 생성 탭
+    Transform bulletTrnspos;
+    float BulletCoolTimer = 0.0f;
+    bool bulletCool = false;
+    public bool bulletOn = false;
+
     private void Awake()
     {
         //playertransPos = transform;
-        beForemanulHand = manulHandPos.rotation;
+        //beForemanulHand = manulHandPos.rotation;
         playertransPos = GetComponent<Transform>();
+    }
+    private void Start()
+    {
+        gameManager = GameManager.Instance;
     }
     // Update is called once per frame
     void Update()
     {
-        modCheack();
-        
+        weaponCoolTime();
+        BulletCoolTime();
     }
     /// <summary>
-    /// 공격 방식을 정한다
+    /// 무기의 쿨타임
     /// </summary>
-    private void modCheack()//수동 공격 없애면 수정 필요함
+    private void weaponCoolTime()
     {
+        //autoObj1.SetActive(false);
+        //autoCheack = false;
         autoTimer += Time.deltaTime;
-        if (autoTimer > autoTime)//수동 공격 없애면 수정 필요함
+        //Debug.Log(autoTime);
+        if (autoTimer >= autoTime)
         {
-            manulCheack = false;
             autoCheack = true;
-            manulcoolTimer = 0.0f;
-            autoObj1.SetActive(true);
-            //autoObj2.SetActive(true);
-            //autoObj3.SetActive(true);
-            //autoObj4.SetActive(true);
-            //manulObj.SetActive(false);
+            autoObj[0].SetActive(true);//0을 변수로 바꿀 필요 있음
             AutoMod();
-        }
-        if (Input.GetKeyDown(KeyCode.Space) || 
-            Input.GetKeyDown(KeyCode.LeftControl))//수동 공격 없애면 수정 필요함
-        {
-            manulCheack = true;
-            autoCheack = false;
-            autoTimer = 0.0f;
-            autoObj1.SetActive(false);
-            //autoObj2.SetActive(false);
-            //autoObj3.SetActive(false);
-            //autoObj4.SetActive(false);
-            //manulObj.SetActive(true);
-            //manualMod();
-
+            AutocoolTimer += Time.deltaTime;
+            if (AutocoolTimer >= AutocoolTime)
+            {
+                autoObj[0].SetActive(false);
+                autoCheack = false;
+                autoTimer = 0.0f;
+                AutocoolTimer = 0.0f;
+            }
         }
     }
 
@@ -92,33 +92,32 @@ public class AttakProces : MonoBehaviour
                 (playertransPos.localScale.x == -1))//Scale
             {
                 autoHandRoT.rotation = tRoDefolt * Defolt;
-                //Debug.Log(autoHandRoT.rotation.z);
-                //Debug.Log(tRoDefolt);
+
             }
-            //Debug.Log(autoHandRoT.rotation.z);
+            
 
         }
-        
+
     }
-    /// <summary>
-    ///  수동 공격
-    /// </summary>
-    private void manualMod()//삭제 고민중,애초에 미완성
+    
+    private void BulletCoolTime() 
     {
-        if (manulCheack == true)
-        {      
-            manulcoolTimer = manulcoolTimer * Time.deltaTime;
-            Quaternion tRoDefolt = autoHandRoT.rotation;
-            Quaternion Defolt = new Quaternion();
-            Defolt = Quaternion.Euler(0, 0, 60f * Time.deltaTime);
-            autoHandRoT.rotation = Defolt* tRoDefolt;
-            if (manulcoolTimer> manulcoolTime) 
-            {
-                manulHandPos.rotation = beForemanulHand;
-            }
-
+        BulletCoolTimer += Time.deltaTime;
+        if (BulletCoolTimer > 0.6 ) 
+        {
+            creatGunBullet();
+            BulletCoolTimer = 0.0f;
         }
-         
-
     }
+    private void creatGunBullet()//자동으로 맞춰주는 총알생성
+    {
+        enemy = FindObjectOfType<Enemy>();
+        if (enemy == null) { return; }//몹이 없을때 사용 안함
+        Vector3 trspos = transform.position;//내 위치
+        GameObject go = Instantiate(bulletKind[0], trspos,
+            Quaternion.identity, creatTab.transform);
+    }
+  
+
+
 }

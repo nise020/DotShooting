@@ -1,131 +1,127 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
+using static TagorDataList;
 
 
 public class Enemy : MonoBehaviour
 {
     Weapon weapon;
-    GameManager gameManager;
+    OppositionBullet bullet;
     ItemManager itemManager;
+    PlayerStatas playerStatas;
     Vector3 moveDir;
-    Transform MobTrnspos;
-    private float beforeX;
     CapsuleCollider2D mobCollider;
+    protected GameManager gameManager;
+    protected Transform MobTrnspos;
+    protected float beforeX;
 
     [Header("몬스터 정보")]
-    public int HP = 1;//퍼블릭 전환 가능성 있음
-    Animator anim;
-    float deathTime = 0.3f;
-    float deathTimer = 0.2f;
-    [SerializeField] float moveSpeed = 0.5f;//몹 이동 속도
-    public bool Mobnull = false; 
+    [SerializeField] protected int HP;//퍼블릭 전환 가능성 있음
+    protected Animator anim;
+    protected float deathTime = 0.3f;
+    protected float deathTimer = 0f;
+    [SerializeField] protected float moveSpeed = 0.5f;//몹 이동 속도
+    public bool Mobnull = false;//수정필요
+    int MobDamage = 1;
+
+    [Header("파괴시 점수")]
+    [SerializeField] protected int score;
 
 
-    private void Awake()
+    protected void Awake()
     {
         MobTrnspos = transform;
-        gameManager = FindObjectOfType<GameManager>();
-        //지우면 ㄴㄴ
-        //public 상태의 변수를 참을수 있음
-        //자동 완성 기능으로 써짐
         beforeX = MobTrnspos.position.x;//기존에 x값 확인
         mobCollider = GetComponent<CapsuleCollider2D>();
         anim = GetComponent<Animator>();
     }
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected void Start()
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Weapon"))
-        {
-            HP = HP - 1;
-            deathCheck();
-
-            //deamageCheack();
-        }
+        gameManager = FindObjectOfType<GameManager>();
+        playerStatas = FindObjectOfType<PlayerStatas>();
     }
-    /// <summary>
-    /// 데미지 계산
-    /// </summary>
-    private void deamageCheack()//<-class Enemy
+    protected void OnTriggerEnter2D(Collider2D collision)
     {
-        //int MaxHP = HP;//1
-        HP = HP - weapon.WeaponDamage;//class.public int = 1
-        return;
-        //HP = MaxHP;
-        deathCheck();//if (HP <= 0)
-        //이 부분은 잘 작동 합니다
-    }
-
-   /// <summary>
-   /// 사망한지 체크
-   /// </summary>
-    private void deathCheck()
-    {
-        if (HP <= 0)
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Sword"))
         {
-            anim.SetBool("Death", true);
-            deathTimer += Time.deltaTime;//애니메이션 재생시간
-            //Destroy(gameObject);
-            if (deathTimer >= deathTime)
+            weapon = collision.gameObject.GetComponent<Weapon>();
+
+            if (weapon != null) 
             {
-                Destroy(gameObject);
-                Mobnull = true;
-                deathTimer = 0.0f;
-                gameManager.CreateItemCheck(transform.position);
+                int damage = 0;
+                weapon.WeapondeamageCheack(out damage);
+                HP -= damage;
             }
-            Mobnull = false ;//위치 조정 필요
+            //deathCheck();
+  
         }
-        
-    }
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Bullet"))
+        {
+            bullet = collision.gameObject.GetComponent<OppositionBullet>();
+            
+            if (bullet != null) 
+            {
+                int damage = 0;
+                bullet.BulletdeamageCheack(out damage);
+                HP -= damage;
+                //Debug.Log(HP);
+            }
+            //deathCheck();
 
-    private void Update()
+        }
+    }
+    protected void Update()
     {
         Mobmoving();
         seeCheack();
         deathCheck();
     }
-
-
-
-
-    private void Atteak()//폐기예정
+    protected virtual void deathCheck()
     {
-        //임시기능
-        if (mobCollider.IsTouchingLayers(LayerMask.GetMask("Player")) == true) 
+        if (HP <= 0)
         {
-            Destroy(gameObject);
+            //Debug.Log(HP);
+            anim.SetBool("Death", true);
+            deathTimer += Time.deltaTime;//애니메이션 재생시간
+            //Debug.Log($"deathTimer={deathTimer}");
+            if ((deathTimer > deathTime))
+            {
+                gameManager.CreateItemCheck(transform.position);
+                Destroy(gameObject);
+                deathTimer = 0f;
+            }
+   
         }
     }
+    public void MobDemageCheack(out int _iNum)//<-class Enemy
+    {
+        _iNum = MobDamage;
 
-
+    }
 
     /// <summary>
     /// 플레이어가 있는 방향으로 자동으로 이동합니다
     /// 보스를 추가하면 사용 예정(주의! public임)
     /// </summary>
-    public void Mobmoving() 
+    protected virtual void Mobmoving() 
     {
+        if (playerStatas == null) { return; }
         Vector3 playerPos;
-       
-        if (gameManager.trsTarget == null)//player가 죽었을 경우
-        {
-            MobTrnspos = transform;
-        }
-        else 
-        {
-            gameManager.PlayerTrsPosiTion(out playerPos);//출력용
-            Vector3 distance = playerPos - MobTrnspos.position;
-            distance.z = 0.0f;
-            MobTrnspos.Translate(distance.normalized * moveSpeed * Time.deltaTime);
-            //Debug.Log($"{distance}");//수정필요
+        gameManager.PlayerTrsPosiTion(out playerPos);//출력용
+        Vector3 distance = playerPos - MobTrnspos.position;
+        distance.z = 0.0f;
+        MobTrnspos.Translate(distance.normalized * moveSpeed * Time.deltaTime);
 
-        }
+        //Debug.Log(distance);
+        //Debug.Log($"{distance}");//수정필요
 
     }
     /// <summary>
     /// 이동하는 방향에 따라서 Scale을 조절해 좌우로 이동하는것 처럼 보이게 한다
     /// </summary>
-    private void seeCheack()
+    protected void seeCheack()
     {
         Vector3 scale = MobTrnspos.localScale;
         float affterX = MobTrnspos.position.x;

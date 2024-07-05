@@ -5,26 +5,51 @@ using UnityEngine.UI;
 
 public class Weapon : MonoBehaviour
 {
-    Enemy enemy;
-    [SerializeField] bool weaponScaleCheack = false;
-    private Vector2 upgraid;
+    PlayerStatas playerStatas;
+
+    [Header("검의 이미지")]
+    [SerializeField] List < Sprite> swordSprite;//업그레이드 검의 스프라이트
+    SpriteRenderer weaponSpriteRd;//현재 검의 스프라이트 렌더러
+    [SerializeField] public bool UpgaidBool = false;//검 이미지 변신 여부
+    public int swordUpgraidcount = 0;
+    public int weaponSpriteListCount = 0;
+    public int swordUpgraidMaxcount = 3;
+
+
+    [Header("검의 크기")]
+    [SerializeField] public bool WeaponScaleCheack = false;//검의 크기 여부
     Transform trsWeapon;//검의 상태,크기조정
-    Image image;//검의 스프라이트
+    public int swordScalecount = 0;
+    public int swordScaleMaxcount = 2;
+
+
+    [Header("검의 데미지")]
     public int WeaponDamage = 1;
-    BoxCollider2D hiteEria;
+    public int WeaponMaxDamage = 4;//미정
+    int WeaponDamageMaxcount = 1;
+    //UpgaidBool = false;
+    //weaponScaleCheack = false;
 
     private void Awake()
     {
-        image = GetComponent<Image>();
+        weaponSpriteRd = GetComponent<SpriteRenderer>();
         trsWeapon = GetComponent<Transform>();
-        hiteEria = GetComponent<BoxCollider2D>();
     }
     
+    /// <summary>
+    /// 데미지 계산
+    /// </summary>
+    public void WeapondeamageCheack(out int _iNum)//<-class Enemy
+    {
+        _iNum = WeaponDamage;
+
+    }
+
+
     private void Update()
     {
         weaponScale();
-        //weaponUpgraid();
-        //weaponPluse();
+        weaponUpgraid();
     }
 
 
@@ -45,16 +70,20 @@ public class Weapon : MonoBehaviour
     /// <exception cref="NotImplementedException"></exception>
     private void weaponUpgraid()
     {
+        if (UpgaidBool == true && swordUpgraidcount > swordUpgraidMaxcount) { return; }
 
+        if (UpgaidBool == true && swordUpgraidcount < swordUpgraidMaxcount) 
+        {
+            swordUpgraidcount += 1;//조정필요
+
+            weaponSpriteRd.sprite = swordSprite[weaponSpriteListCount];
+            weaponSpriteListCount += 1;
+            
+            UpgaidBool = false;
+        }
+        //swordUpgraidcount += 1;
     }
 
-    /// <summary>
-    /// 무기를 최대 4개까지 증식
-    /// </summary>
-    private void weaponPluse()
-    {
-
-    }
 
     /// <summary>
     /// 무기의 크기 증가
@@ -62,15 +91,20 @@ public class Weapon : MonoBehaviour
     /// <exception cref="NotImplementedException"></exception>
     private void weaponScale()
     {
-        if (weaponScaleCheack==true)//버튼 누를시 true 예정 
+        if (WeaponScaleCheack == true && swordScalecount > swordScaleMaxcount) { return; }
+        if (WeaponScaleCheack == true && swordScalecount < swordScaleMaxcount)//버튼 누를시 true 예정 
         {
-            Vector2 newScale = transform.localScale;//변수 지정
+            swordScalecount += 1;//조정필요
+
+            Vector2 newScale = trsWeapon.localScale;//변수 지정
             float pluseScale = -0.5f;//수치
             newScale.x += -Mathf.Abs(pluseScale);//증감
             newScale.y += Mathf.Abs(pluseScale);
-            transform.localScale = newScale;//반영
-            weaponScaleCheack = false;
+            trsWeapon.localScale = newScale;//반영
+
+            WeaponScaleCheack = false;
         }
+        //swordScalecount += 1;
     }
-    
+
 }

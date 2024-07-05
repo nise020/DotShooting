@@ -10,15 +10,14 @@ public class MoveControll : MonoBehaviour
     /// <summary>
     /// 플레이어 이동속도(버프 부여 가능)
     /// </summary>
-    [SerializeField] public static float moveSpeed = 2.0f;
-    private float MaxiumSpeed = 5.0f;
+    [SerializeField] public float moveSpeed = 2.0f;
+    public float MaxiumSpeed = 5.0f;
     Vector3 moveDir;
     Animator moveAnim;
     CapsuleCollider2D cap2d;
     Rigidbody2D rigid;
     Vector2 moveVe2;
     Transform trsPos;
-
     //[Header("자동 공격 Scale")]
     //[SerializeField] Transform autoHandScale;
     //[SerializeField] Transform autoFabScale;//오토 공격 상태
@@ -38,7 +37,7 @@ public class MoveControll : MonoBehaviour
         moveAnim = transform.GetComponent<Animator>();
         //cap2d = GetComponent<CapsuleCollider2D>();
     }
-    
+
     // Update is called once per frame
     void Update()
     {
@@ -86,7 +85,7 @@ public class MoveControll : MonoBehaviour
         moveDir.x = Input.GetAxisRaw("Horizontal");// -1 0 1
         moveDir.y = Input.GetAxisRaw("Vertical");// -1 0 1
 
-        transform.position += moveDir * moveSpeed * Time.deltaTime;
+       transform.position += moveDir * moveSpeed * Time.deltaTime;
         
         //참고용
         //moveDir.y = rigid.velocity.y;
