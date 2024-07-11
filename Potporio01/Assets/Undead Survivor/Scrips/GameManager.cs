@@ -1,5 +1,7 @@
+using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +14,7 @@ public class GameManager : MonoBehaviour
     PlayerStatas playerStatas;
     //[Header("오브젝트 들")]
     ItemManager itemManager;
-    
+    //OppositionBullet OpBullet;
 
     public static GameManager Instance;
 
@@ -26,9 +28,10 @@ public class GameManager : MonoBehaviour
     [Header("몬스터 생성")]
     [SerializeField] public List<GameObject> mobList;//몹 리스트
     [SerializeField] public List<Transform> mobTrs;//몹 상태
-    [SerializeField] Transform CreatTab;
+    [SerializeField] public Transform CreatTab;
     [SerializeField] List<Vector2> createLine;
     private bool isSpawn = false;
+    public bool MobHPUp = false;
 
     [Header("적 생성시간")]
     float mobSpawnTimer = 0.0f;// 타이머
@@ -36,21 +39,44 @@ public class GameManager : MonoBehaviour
 
     [Header("아이템 종류, 확률")]
     [SerializeField] List <GameObject> ItemKind;//아이템 종류
+    [SerializeField] List <GameObject> WeaponKind;//아이템 종류
     [SerializeField, Range(0.0f, 100f)] float IteamProbability;//외부에서 조정 가능
     //bool imItem = false;//아이템 생성 여부
     [SerializeField] Transform creatItemTab;
     [SerializeField] GameObject creatExp;
+    int Esyecount = 0;
 
-    [Header("유도 총알")]
-    [SerializeField] Transform bulletTrnspos;
 
-    [Header("아이템 확률")]
-    [SerializeField] List<GameObject> bulletObj;
 
     [Header("체력 이미지")]
     [SerializeField] HpCanvers hpCanvers;
+
+    [Header("플레이 시간")]
+    [SerializeField] TMP_Text timeText;
+    float minuteTimer = 0f;
+    float minuteTime = 60f;
+    float hour = 0f;
+
+    [Header("점수")]
+    [SerializeField] TMP_Text scoreText;
+    int score;
+
+    [Header("게임오버메뉴")]
+    [SerializeField] GameObject objGameOverMenu;
+    [SerializeField] TMP_Text GameOverMenuScoreText;
+    [SerializeField] TMP_Text GameOverMenuRankText;
+    [SerializeField] TMP_Text GameOverMenuBtnText;
+    [SerializeField] TMP_InputField IFGameOverMenuRank;
+    [SerializeField] Button btnGameOverMenu;
+
+
     private void Awake()
     {
+        if (RankIn.isStating == false)
+        {
+            //UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+        }
+
         if (Instance == null)
         {
             Instance = this;//=GameManager가 된다
@@ -60,11 +86,35 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        cam = Camera.main;
+        //cam = Camera.main;
     }
+
     private void Update()
     {
-        createEnemy();//활성화 필요
+        runTime();
+        //createEnemy();//활성화 필요
+    }
+
+
+    public void ScorePluse(int number)//점수 증가
+    {
+        score += number;
+        scoreText.text = $"{score.ToString("d6")}";
+    }
+
+    private void runTime()//플레이 타임
+    {
+        minuteTimer += 1 * Time.deltaTime;
+        //int count = minuteTimer;
+        timeText.text = $"{((int)hour).ToString("d2")}:{((int)minuteTimer).ToString("d2")}";
+        if (minuteTimer> minuteTime) 
+        {
+            minuteTimer = 0;
+            hour += 1;
+            mobSpawnTime -= 0.2f;
+            MobHPUp = true;
+        }
+
     }
 
     /// <summary>
@@ -118,125 +168,8 @@ public class GameManager : MonoBehaviour
 
             GameObject go = Instantiate(mobList[mobiRoad], done, Quaternion.identity, CreatTab);
             mobSpawnTimer = 0.0f;
-            #region 일일히 예외처리 노가다
-            //int count = 1;
-            //for (int INum = 0; INum < count; INum++)
-            //{
-            //    if (Iroad == 1)//x=10
-            //    {
-            //        if (defoltPos.x < 0.0f && defoltPos.y < 0.0f)// -/-
-            //        {
-            //            defoltPos.x *= defoltPos.x + createLine[0].x;
-            //            defoltPos.y *= defoltPos.y + Random.Range(-4.0f, 4.0f);
-            //        }
-            //        else if (defoltPos.x > 0.0f && defoltPos.y < 0.0f)//+/-
-            //        {
-            //            defoltPos.x = defoltPos.x + createLine[0].x;
-            //            defoltPos.y *= defoltPos.y + Random.Range(-4.0f, 4.0f);
-            //        }
-            //        else if (defoltPos.x > 0.0f && defoltPos.y > 0.0f)//+/+
-            //        {
-            //            defoltPos.x = defoltPos.x + createLine[0].x;
-            //            defoltPos.y = defoltPos.y + Random.Range(-4.0f, 4.0f);
-            //        }
-            //        else if (defoltPos.x < 0.0f && defoltPos.y > 0.0f)//-/+
-            //        {
-            //            defoltPos.x *= defoltPos.x + createLine[0].x;
-            //            defoltPos.y = defoltPos.y + Random.Range(-4.0f, 4.0f);
-            //        }
 
-            //    }
-            //    else if (Iroad == 2)//x=-10
-            //    {
-            //        if (defoltPos.x < 0.0f && defoltPos.y < 0.0f)// -/-
-            //        {
-            //            defoltPos.x = defoltPos.x + createLine[1].x;
-            //            defoltPos.y = defoltPos.y + Random.Range(-4.0f, 4.0f);
-            //        }
-            //        else if (defoltPos.x > 0.0f && defoltPos.y < 0.0f)//+/-
-            //        {
-            //            defoltPos.x *= defoltPos.x + createLine[1].x;
-            //            defoltPos.y = defoltPos.y + Random.Range(-4.0f, 4.0f);
-            //        }
-            //        else if (defoltPos.x > 0.0f && defoltPos.y > 0.0f)//+/+
-            //        {
-            //            defoltPos.x *= defoltPos.x + createLine[1].x;
-            //            defoltPos.y *= defoltPos.y + Random.Range(-4.0f, 4.0f);
-            //        }
-            //        else if (defoltPos.x < 0.0f && defoltPos.y > 0.0f)//-/+
-            //        {
-            //            defoltPos.x = defoltPos.x + createLine[1].x;
-            //            defoltPos.y += defoltPos.y + Random.Range(-4.0f, 4.0f);
-            //        }
-            //    }
-            //    else if (Iroad == 3)//y=7
-            //    {
-            //        if (defoltPos.x < 0.0f && defoltPos.y < 0.0f)// -/-
-            //        {
-            //            defoltPos.y *= defoltPos.y + createLine[2].y;
-            //            defoltPos.x *= defoltPos.x + Random.Range(-8.0f, 8.0f);
-            //        }
-            //        else if (defoltPos.x > 0.0f && defoltPos.y < 0.0f)//+/-
-            //        {
-            //            defoltPos.y = defoltPos.y + createLine[2].y;
-            //            defoltPos.x *= defoltPos.x + Random.Range(-8.0f, 8.0f);
-            //        }
-            //        else if (defoltPos.x > 0.0f && defoltPos.y > 0.0f)//+/+
-            //        {
-            //            defoltPos.y = defoltPos.y + createLine[2].y;
-            //            defoltPos.x = defoltPos.x + Random.Range(-8.0f, 8.0f);
-            //        }
-            //        else if (defoltPos.x < 0.0f && defoltPos.y > 0.0f)//-/+
-            //        {
-            //            defoltPos.y *= defoltPos.y + createLine[2].y;
-            //            defoltPos.x = defoltPos.x + Random.Range(-8.0f, 8.0f);
-            //        }
 
-            //    }
-            //    else if (Iroad == 4)//y=7
-            //    {
-            //        if (defoltPos.x < 0.0f && defoltPos.y < 0.0f)// -/-
-            //        {
-            //            defoltPos.y = defoltPos.y + createLine[2].y;
-            //            defoltPos.x = defoltPos.x + Random.Range(-8.0f, 8.0f);
-            //        }
-            //        else if (defoltPos.x > 0.0f && defoltPos.y < 0.0f)//+/-
-            //        {
-            //            defoltPos.y *= defoltPos.y + createLine[2].y;
-            //            defoltPos.x = defoltPos.x + Random.Range(-8.0f, 8.0f);
-            //        }
-            //        else if (defoltPos.x > 0.0f && defoltPos.y > 0.0f)//+/+
-            //        {
-            //            defoltPos.y *= defoltPos.y + createLine[2].y;
-            //            defoltPos.x *= defoltPos.x + Random.Range(-8.0f, 8.0f);
-            //        }
-            //        else if (defoltPos.x < 0.0f && defoltPos.y > 0.0f)//-/+
-            //        {
-            //            defoltPos.y = defoltPos.y + createLine[2].y;
-            //            defoltPos.x *= defoltPos.x + Random.Range(-8.0f, 8.0f);
-            //        }
-            //    }
-            //    done = defoltPos;
-            //    if ((done.x > 10 && done.x > -10) ||
-            //        (done.y > 7 && done.y > -7))
-            //    {
-            //        //y=4//x=8
-            //        defoltPos = targetTransform.position;
-            //        INum = 0;
-            //        continue;
-            //    }
-            //    done = defoltPos;
-            //}
-            #endregion
-
-            #region 끄적이다 주석처리한거
-            //GameObject go = Instantiate(mobList[mobiRoad], defoltPos,Quaternion.identity, CreatTab);
-            // GameObject poroses01 = Instantiate(mobList[mobiRoad], defoltPos,
-            // Quaternion.identity, CreatTab);
-            //GameObject poroses02 = Instantiate(mobList[mobiRoad], CreatTab);
-            //Enemy gosc = go.GetComponent<Enemy>();
-            //CameraPosition,
-            #endregion
         }
 
     }
@@ -246,10 +179,33 @@ public class GameManager : MonoBehaviour
     /// 아이템 생성 확률 계산기
     /// </summary>
     /// <param name="trs"></param>
-    public void CreateItemCheck(Vector3 trs)//경험치 아이템 고민중
+    public void CreateItemCheck(Vector3 trs)
     {
         float randam = Random.Range(0f, 100f);
-        if (IteamProbability >= randam)//확률 부분
+        float WeaponRandam = Random.Range(0f, 100f);
+        if ((IteamProbability > randam)== false && 
+            IteamProbability > WeaponRandam)//장비 아이템,버프
+        {
+            if (Esyecount < 2) //우선 드랍 설정
+            {
+                int number = Random.Range(3, 5);
+
+                GameObject Go = Instantiate(WeaponKind[number],
+                    trs, Quaternion.identity, creatItemTab);
+                Esyecount += 1;
+                WeaponKind[number] = null;
+                return;
+            }
+            int count = WeaponKind.Count;
+            int Number = Random.Range(0, count);
+
+            GameObject go = Instantiate(WeaponKind[Number],
+                trs, Quaternion.identity, creatItemTab);
+            IteamProbability = 0.0f;
+
+        }     
+        else if((IteamProbability > WeaponRandam) == false && 
+            (IteamProbability > randam))//회복용 아이템
         {
             int count = ItemKind.Count;
             int Number = Random.Range(0, count);
@@ -258,19 +214,69 @@ public class GameManager : MonoBehaviour
                 trs, Quaternion.identity, creatItemTab);
             IteamProbability = 0.0f;
         }
-        else //경험치 생성 코드위치
-        {
-            //GameObject go = Instantiate( creatExp,
-            //    trs, Quaternion.identity, creatItemTab);
-            IteamProbability += 0.5f;
-        }
+        else { IteamProbability += 0.5f; }//확률업
+        
     }
-    #region Hpcheck주석
-    //public void Hpcheck(float now, float max)
-    //{
-    //    hpCanvers.HpBar(now, max);
-    //}
-    #endregion
+
+    public void rankCheck()
+    {
+        List<UserData> RankData =
+           JsonConvert.DeserializeObject<List<UserData>>
+           (PlayerPrefs.GetString(RankIn.rankKey));//에러뜸
+
+
+        Debug.Log(RankIn.rankKey);
+        Debug.Log(PlayerPrefs.GetString(RankIn.rankKey));
+        int rank = -1;
+        int count = RankData.Count;
+        for (int iNum = 0; iNum < count; iNum++) 
+        {
+            UserData userDate = RankData[iNum];
+            if (userDate.Score<score) 
+            {
+                rank = iNum;
+                break;
+            }
+        }
+        GameOverMenuScoreText.text = $"점수 : {score.ToString("d6")} ";
+        if (rank != -1)
+        {
+            GameOverMenuRankText.text = $"랭킹 : {rank + 1}등";
+            IFGameOverMenuRank.gameObject.SetActive(true);
+            GameOverMenuBtnText.text = "등록";
+        }
+        else
+        {
+            GameOverMenuRankText.text = "랭크인 하지 못했습니다";
+            IFGameOverMenuRank.gameObject.SetActive(false);
+            GameOverMenuBtnText.text = "메인메뉴로";
+        }
+
+        btnGameOverMenu.onClick.AddListener(() => 
+        {
+            if (rank != -1)//랭크에 등록할때
+            {
+                string name = IFGameOverMenuRank.text;
+                if (name == string.Empty) 
+                {
+                    name = "aaa";
+                }
+                UserData newRank = new UserData();
+                newRank.Score = score;
+                newRank.Name = name;
+
+                RankData.Insert(rank, newRank);
+                RankData.RemoveAt(RankData.Count - 1);
+
+                string value = JsonConvert.SerializeObject(RankData);
+                PlayerPrefs.SetString((RankIn.rankKey), value);
+            }
+
+            FaidInOut.Instance.faid = true;
+            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+        });
+        objGameOverMenu.SetActive(true);
+    }
 
     /// <summary>
     /// 정수를 내보내는 계산기
@@ -296,10 +302,13 @@ public class GameManager : MonoBehaviour
     /// <param name="_pos"></param>
     public void PlayerTrsPosiTion(out Vector3 _pos)
     {
-        _pos = trsTarget.localPosition;
+        _pos = trsTarget.position;
     }
 
-
+    public void EnomyTrsPosiTion(out Vector3 _pos)
+    {
+        _pos = mobList[1].transform.position;
+    }
 
 
 }

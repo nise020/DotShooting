@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
-using UnityEngine.UIElements;
-using static TagorDataList;
 
 public class PlayerStatas : MonoBehaviour
 {
@@ -11,7 +9,8 @@ public class PlayerStatas : MonoBehaviour
     HpCanvers hpCanvers;
     Animator anim;
     MoveControll moveControll;
-    //GameManager gameManager;
+    GameManager gameManager;
+    Weapon weapon;
 
     [Header("플레이어 정보")]
     [SerializeField, Range(1, 10)] int plLevel = 1;//레벨,화면에 표시되게 하고 싶다
@@ -21,56 +20,51 @@ public class PlayerStatas : MonoBehaviour
     [SerializeField] int score = 0;//점수
     float deathTime = 1.0f;//사망처리 시간
     float deathTimer = 0.0f;//
+    bool invicibility = false;
+    float invicibilityTimer = 0;
+    float invicibilityTime = 1;
+    SpriteRenderer spriteRenderer;
     [Header("플레이어 정보")]
     public bool Alive = true;//생존 여부
-    public bool DropGun = false;
-    public bool DropDfGun = false;//자동 조준 드랍 여부
-    //[SerializeField] float expGaigi = 0.0f;//경험치 포인트
-    //[SerializeField] float MaiximumExpGaigi = 10.0f;//경험치 최대치
-    //int magnetDrop = 0;//자력 업그레이드
-    //public bool MagnetItem = false;//자력ON
-    //public bool DropGun = false;
-    //public bool DropGun = false;
+    public bool DropSword = false;//자동 사냥 검 드랍 여부
+    public bool DropOpGun = false;//자동 조준 드랍 여부
+    public bool DropSwordScaleUP = false;//자동 조준 드랍 여부
+    public bool DropSwordUgaid = false;//자동 조준 드랍 여부
 
-    //CircleCollider2D mgcircle;
- 
-    private void OnValidate()
+    private void Awake()
     {
-        //beforHP
-        //NowHp = MaximumHP;
+        NowHp = MaximumHP;
     }
+    private void Start()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        gameManager = GameManager.Instance;
+    }
+    
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Mob"))//무적시간 구현 예정
         {
+            if (invicibility == true) { return; }
             enemy = collision.gameObject.GetComponent<Enemy>();
-            if (enemy != null) 
+            if (enemy != null)
             {
+                OnInvicibility(true);
                 int damage = 0;
                 enemy.MobDemageCheack(out damage);
                 NowHp -= damage;
                 //GameManager.Instance.Hpcheck(NowHp, MaximumHP);//일단 삭제 ㄴㄴ
                 Debug.Log($"NowHp={NowHp}");
             }
-            //if (NowHp <= MaximumHP)//데미지
-            //{
 
-            //}
-            //else { return; }
         }
-        //if (collision.gameObject.layer == LayerMask.NameToLayer("EXP"))//item
-        //{
-        //    expGaigi += 1.0f;//경험치 증가
-        //    //Debug.Log($"expGaigip={expGaigi}");
-        //    if (expGaigi > MaiximumExpGaigi)
-        //    {
-        //        expGaigi = 0.0f;//경험치 초기화
-        //        MaiximumExpGaigi += MaiximumExpGaigi;//경험치 최대치 증가
-        //        Debug.Log($"MaiximumExpGaigi={MaiximumExpGaigi}");
-        //    }
-        //    else { return; }
-        //}
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Heal"))//item
+        else if (collision.gameObject.layer == LayerMask.NameToLayer("MobBullet")) 
+        {
+            if (invicibility == true) { return; }
+            OnInvicibility(true);
+            NowHp -= 1;
+        }
+        else if (collision.gameObject.layer == LayerMask.NameToLayer("Heal"))//item
         {
             if (NowHp < MaximumHP)//힐
             {
@@ -80,7 +74,7 @@ public class PlayerStatas : MonoBehaviour
             }
             else { return; }
         }
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Speed"))//스피드
+        else if (collision.gameObject.layer == LayerMask.NameToLayer("Speed"))//스피드
         {
             moveControll = GetComponent<MoveControll>();
             if (moveControll.MaxiumSpeed > moveControll.moveSpeed)
@@ -89,40 +83,57 @@ public class PlayerStatas : MonoBehaviour
             }
             else { return; }
         }
-        if (collision.gameObject.layer == LayerMask.NameToLayer("SwordScaleUP"))//크기 증가
+        else if (collision.gameObject.layer == LayerMask.NameToLayer("OpGun"))//
         {
+            DropOpGun = true;
 
         }
-        if (collision.gameObject.layer == LayerMask.NameToLayer("SwordUgaid"))//무기 변신
+        else if (collision.gameObject.layer == LayerMask.NameToLayer("Sword"))//
         {
+            DropSword = true;
 
         }
-        //if (collision.gameObject.layer == LayerMask.NameToLayer("Magnet"))//경험치 빨아들이기
-        //{
-        //    MagnetItem = true;
-        //    Destroy(collision.gameObject);
-        //    if (MagnetItem==true) 
-        //    {
-        //        MagnetItem = false;
-        //        //expDeta.DrainEXP();
-        //    }
-        //    ////MgItem = true;
-        //    //if (MgItem == true) 
-        //    //{
-        //    //    mgcircle.radius += 0.1f;
-        //    //    MgItem = false;
-        //    //}
-        //}
+        else if (collision.gameObject.layer == LayerMask.NameToLayer("MaxHpUp"))//
+        {
+            MaximumHP += 1;
+
+        }
+
     }
 
-    //collision.tag == Tool.GetTag(GameTags.Item)
+
     private void Update()
     {
         deathCheck();
+        checkinvicibility();
     }
 
-
-
+    private void checkinvicibility() 
+    {
+        if (invicibility == false)  return; 
+        invicibilityTimer += Time.deltaTime;
+        if (invicibilityTimer > invicibilityTime)
+        {
+            OnInvicibility(false);
+        }
+    }
+    private void OnInvicibility(bool value) 
+    {
+        Color color = spriteRenderer.color;
+        if (value == true)
+        {
+            color.a = 0.5f;
+            invicibility = true;
+            invicibilityTimer = 0;
+        }
+        else 
+        {
+            color.a = 1.0f;
+            invicibility = false;
+            invicibilityTimer = invicibilityTime;
+        }
+        spriteRenderer.color = color;
+    }
     /// <summary>
     /// 사망시 연출
     /// </summary>
@@ -130,7 +141,7 @@ public class PlayerStatas : MonoBehaviour
     {
         if (NowHp <= 0 && Alive == true)
         {
-            //Alive = false;
+            NowHp = 0;
             anim = GetComponent<Animator>();
             anim.SetBool("Death", true);
             deathTimer += Time.deltaTime;
@@ -139,8 +150,7 @@ public class PlayerStatas : MonoBehaviour
             {
                 Alive = false;
                 Destroy(gameObject);
-
-                //gameObject.SetActive(false);//수정 필요
+                //gameManager.rankCheck();//아직 시동 ㄴㄴ
             }
         }
         

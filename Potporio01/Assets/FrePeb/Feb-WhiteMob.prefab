@@ -121,10 +121,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f41fe501e0b35f498bdedbd939b3bcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Type: 2
   HP: 1
   moveSpeed: 0.5
   Mobnull: 0
-  score: 100
+  WhithWeapon: {fileID: 7904162442009975892, guid: 55498cd630a4f0542a6c78264a6db99d, type: 3}
+  craetTab: {fileID: 0}
+  CodeOn: 1
+  score: 300
 --- !u!70 &4056821391991866888
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

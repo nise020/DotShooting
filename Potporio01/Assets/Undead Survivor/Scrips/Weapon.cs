@@ -6,12 +6,13 @@ using UnityEngine.UI;
 public class Weapon : MonoBehaviour
 {
     PlayerStatas playerStatas;
+    AttakProces attakProces;
 
     [Header("검의 이미지")]
     [SerializeField] List < Sprite> swordSprite;//업그레이드 검의 스프라이트
-    SpriteRenderer weaponSpriteRd;//현재 검의 스프라이트 렌더러
-    [SerializeField] public bool UpgaidBool = false;//검 이미지 변신 여부
-    public int swordUpgraidcount = 0;
+    public SpriteRenderer weaponSpriteRd;//현재 검의 스프라이트 렌더러
+    [SerializeField] public bool UpGraidBool = false;//검 이미지 변신 여부
+    public int swordUpgraidcount = 1;
     public int weaponSpriteListCount = 0;
     public int swordUpgraidMaxcount = 3;
 
@@ -34,8 +35,9 @@ public class Weapon : MonoBehaviour
     {
         weaponSpriteRd = GetComponent<SpriteRenderer>();
         trsWeapon = GetComponent<Transform>();
+        attakProces = FindObjectOfType<AttakProces>();
     }
-    
+
     /// <summary>
     /// 데미지 계산
     /// </summary>
@@ -48,40 +50,30 @@ public class Weapon : MonoBehaviour
 
     private void Update()
     {
-        weaponScale();
-        weaponUpgraid();
+        //weaponScale();
+        //weaponUpgraid();
     }
 
-
-    /// <summary>
-    /// 데미지 계산기
-    /// </summary>
-    /// <param name="_iNum"></param>
-    /// <returns>int _iNum</returns>
-    public int DamageFigure(int _iNum)
-    {
-        _iNum -= WeaponDamage;//public int = 1(필드)
-        Debug.Log(_iNum);
-        return _iNum;
-    }
     /// <summary>
     /// 무기의 스프라이트 이미지를 변경
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    private void weaponUpgraid()
+    public void weaponUpgraid()
     {
-        if (UpgaidBool == true && swordUpgraidcount > swordUpgraidMaxcount) { return; }
+        //swordUpgraidcount += 1;//조정필요
+        if (attakProces.DropSwordUgaid == false) { return; }
+        if (attakProces.DropSwordUgaid == true && swordUpgraidcount > swordUpgraidMaxcount) { return; }
 
-        if (UpgaidBool == true && swordUpgraidcount < swordUpgraidMaxcount) 
+        if (attakProces.DropSwordUgaid == true && swordUpgraidcount < swordUpgraidMaxcount)
         {
             swordUpgraidcount += 1;//조정필요
 
             weaponSpriteRd.sprite = swordSprite[weaponSpriteListCount];
             weaponSpriteListCount += 1;
-            
-            UpgaidBool = false;
+            WeaponDamage += 1;
+            Debug.Log($"weaponSpriteRd={weaponSpriteRd}");
         }
-        //swordUpgraidcount += 1;
+        attakProces.DropSwordUgaid = false;
     }
 
 
@@ -91,12 +83,12 @@ public class Weapon : MonoBehaviour
     /// <exception cref="NotImplementedException"></exception>
     private void weaponScale()
     {
-        if (WeaponScaleCheack == true && swordScalecount > swordScaleMaxcount) { return; }
-        if (WeaponScaleCheack == true && swordScalecount < swordScaleMaxcount)//버튼 누를시 true 예정 
+        if (attakProces.DropSwordUgaid == true && swordScalecount > swordScaleMaxcount) { return; }
+        if (attakProces.DropSwordUgaid == true && swordScalecount < swordScaleMaxcount)//버튼 누를시 true 예정 
         {
             swordScalecount += 1;//조정필요
 
-            Vector2 newScale = trsWeapon.localScale;//변수 지정
+            Vector3 newScale = trsWeapon.localScale;//변수 지정
             float pluseScale = -0.5f;//수치
             newScale.x += -Mathf.Abs(pluseScale);//증감
             newScale.y += Mathf.Abs(pluseScale);

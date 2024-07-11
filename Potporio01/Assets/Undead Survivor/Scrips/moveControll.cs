@@ -12,7 +12,7 @@ public class MoveControll : MonoBehaviour
     /// </summary>
     [SerializeField] public float moveSpeed = 2.0f;
     public float MaxiumSpeed = 5.0f;
-    Vector3 moveDir;
+    Vector2 moveDir;
     Animator moveAnim;
     CapsuleCollider2D cap2d;
     Rigidbody2D rigid;
@@ -35,7 +35,7 @@ public class MoveControll : MonoBehaviour
     {
         rigid = GetComponent<Rigidbody2D>();
         moveAnim = transform.GetComponent<Animator>();
-        //cap2d = GetComponent<CapsuleCollider2D>();
+        cap2d = GetComponent<CapsuleCollider2D>();
     }
 
     // Update is called once per frame
@@ -43,11 +43,20 @@ public class MoveControll : MonoBehaviour
     {
         runAnim();
         seeCheack();
+        
+    }
+    private void FixedUpdate()
+    {
         playerMoving();
     }
 
-
-
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Line"))//크기 증가
+        {
+            Debug.Log(111);
+        }
+    }
     public void SpeedUP() 
     {
         if (MaxiumSpeed>moveSpeed) 
@@ -82,11 +91,12 @@ public class MoveControll : MonoBehaviour
     private void playerMoving()//움직임 조절 가능
     {
         
-        moveDir.x = Input.GetAxisRaw("Horizontal");// -1 0 1
-        moveDir.y = Input.GetAxisRaw("Vertical");// -1 0 1
+        moveDir.x = Input.GetAxisRaw("Horizontal") * moveSpeed;// -1 0 1
+        moveDir.y = Input.GetAxisRaw("Vertical") * moveSpeed;// -1 0 1
 
-       transform.position += moveDir * moveSpeed * Time.deltaTime;
-        
+        rigid.velocity = moveDir;
+        //transform.position += moveDir * Time.deltaTime;
+        //rigid.MovePosition(rigid.position + moveDir * Time.fixedDeltaTime);
         //참고용
         //moveDir.y = rigid.velocity.y;
         //rigid.velocity = moveDir;

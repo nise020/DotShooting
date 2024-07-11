@@ -8,16 +8,15 @@ public class OppositionBullet : MonoBehaviour
     GameManager gameManager;
     PlayerStatas playerStatas;
     Enemy enemy;
-    AttakProces attakProces;
-
-    Vector2 enemyTrsBe;
+    Vector3 enPos;
+    Vector3 trsPos;
+    Vector3 plPos;
     Transform bulletTrnspos;
-    GameObject bulletObj;
     int bulletDamage = 1;
+    bool on = true;
     private void Awake()
     {
         enemy = FindObjectOfType<Enemy>();
-        enemyTrsBe = enemy.transform.localPosition;
         playerStatas = FindObjectOfType<PlayerStatas>();
     }
     private void OnBecameInvisible()//카메라 밖에 사라졌을때
@@ -33,74 +32,57 @@ public class OppositionBullet : MonoBehaviour
     }
     void Start()
     {
-        bulletTrnspos = transform;
-        gameManager = FindObjectOfType<GameManager>();
-        attakProces = FindObjectOfType<AttakProces>();
-        bulletObj = GetComponent<GameObject>();
+        //bulletTrnspos = transform;
+        gameManager = GameManager.Instance;
+        //transform.position = gameManager.trsTarget.position;
+        enPos = enemy.transform.position;// position;
+        trsPos = transform.position;
+        plPos = playerStatas.transform.position;
+
+        //attakProces = FindObjectOfType<AttakProces>();
+        //bulletObj = GetComponent<GameObject>();
     }
     private void Update()
     {
-       BulletposRotation();
-       
-    }
-    private void BulletposRotation() //총알방향 회전
-    {
-        if (enemy == null) { return; }
-        Vector2 enPos = enemyTrsBe;
-        Vector2 blPos = bulletTrnspos.localPosition;
-        Vector2 defolt = enPos - blPos;
-        Vector2 vecUp = Vector2.up;
-        float age = Vector2.Angle(vecUp, defolt);
-        if (enPos.x >= 0.0 && enPos.y >= 0.0 ||
-            enPos.x >= 0.0 && enPos.y <= 0.0) 
-        {
-            age = -Mathf.Abs(age);
-        }
-        bulletTrnspos.rotation = Quaternion.Euler(0,0, age);
+        BulletposRotation();
         BulletposSpeed();
-        //Debug.Log($"age={age}");
-
-        //float age = Mathf.Atan2(bulletTrnspos.localPosition.y, enemy.transform.localPosition.x)* Mathf.Rad2Deg;
-        // Mathf.Asin()
-        // MathF.Sign()
-        //Deg2Rad;
     }
+    public void BulletposRotation() //총알방향 회전
+    {
+        if (enemy == null || on == false) { return; }
+        if (on==true) 
+        {
+            //Vector3 enPos = enemy.transform.position;
+            //gameManager.PlayerTrsPosiTion(out Vector3 blPos);
+            Vector2 defolt = enPos - plPos;
+            //Vector2 vecUp = Vector2.up;
+            //float age = Vector2.Angle(vecUp, defolt);
+            float angle = Mathf.Atan2(defolt.y, defolt.x) * Mathf.Rad2Deg;
+            if (enPos.x >= 0.0 && enPos.y >= 0.0 ||
+                enPos.x >= 0.0 && enPos.y <= 0.0)
+            {
+                //age = -Mathf.Abs(age);
+                angle = -Mathf.Abs(angle);
+            }
+            //else if(enPos.x <= 0.0 && enPos.y >= 0.0)
+            //{
+            //    //age = Mathf.Abs(age);
+            //    angle = Mathf.Abs(angle);
+            //}
+            //transform.rotation = Quaternion.Euler(0, 0, age);
+            transform.rotation = Quaternion.Euler(0, 0, angle);
+            on = false;
+            Debug.Log(angle);
+        }
+    }
+        
 
     private void BulletposSpeed()
     {
-        //if (enemy.gameObject == null) { return; }
-        //float age = Mathf.Atan2(bulletTrnspos.position.y, enemy.transform.localPosition.x);
         if (playerStatas==null) { return;  }
 
-        Vector3 enPos = enemyTrsBe;
-        Vector3 blPos = bulletTrnspos.localPosition;
-        Vector3 plPos;
-        gameManager.PlayerTrsPosiTion(out plPos);
-        Vector3 distance = plPos - enPos;
-        bulletTrnspos.position = bulletTrnspos.position + enPos * 4.0f * Time.deltaTime;
-        if (enemy == null) { Destroy(gameObject); }
-        #region 조건 적다가 망함
-        //Vector3 distance = plPos - enPos;
-        //if ((distance.x > 2f  && distance.y > 2f ) == false &&
-        //    (distance.x < -2f && distance.y < -2f) == false &&
-        //    (distance.x > 2f  && distance.y < -2f) == false &&
-        //    (distance.x < -2f && distance.y > 2f) == false )
-        //{
-        //    Debug.Log(distance);
-        //    bulletTrnspos.position = bulletTrnspos.position + enPos * 4.0f * Time.deltaTime;
-
-
-        //    if (bulletObj.transform.position.x > enemy.transform.localPosition.x &&
-        //        bulletObj.transform.position.y > enemy.transform.localPosition.y) 
-        //    {  Destroy(gameObject); }
-
-        //}
-        #endregion
-        //Vector3 distance = trspos - bulletTrnspos.localPosition;
-        //distance.z = 0.0f;
-        //GameManager go = GetComponent<GameManager>();
-        //gameManager.MobTrsPosiTion(out trspos);//출력용
-        //한 방향으로 날아가게된 총알
+        Vector3 distance = (enPos - trsPos).normalized;
+        transform.position += distance * 5.0f * Time.deltaTime;
     }
     public void BulletdeamageCheack(out int _iNum)//<-class Enemy
     {

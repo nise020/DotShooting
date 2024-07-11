@@ -17,6 +17,7 @@ public class HpCanvers : MonoBehaviour
     private void Start()
     {
         gameManager = GameManager.Instance;
+        playerStatas = FindObjectOfType<PlayerStatas>();
     }
     private void Update()
     {
@@ -30,14 +31,14 @@ public class HpCanvers : MonoBehaviour
     /// </summary>
     private void HpPos() 
     {
-        playerStatas = FindObjectOfType<PlayerStatas>();
+        //playerStatas = FindObjectOfType<PlayerStatas>();
         Vector2 posY = playerStatas.transform.position;
         posY.y += 1;
         transform.position = posY;
     }
     public void HpBar(/*float now, float max*/)
     {
-        playerStatas = FindObjectOfType<PlayerStatas>();
+        //playerStatas = FindObjectOfType<PlayerStatas>();
        float now = playerStatas.NowHp;
        float max = playerStatas.MaximumHP;
         PlayerHPImg.fillAmount = now / max ;
