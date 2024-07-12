@@ -60,7 +60,7 @@ public class MobBullet : MonoBehaviour
     private void BulletposSpeed()
     {
         Vector3 distance = (plPos - trsPos).normalized;
-        transform.position += distance * 3.0f * Time.deltaTime;
+        transform.position += distance * 1.0f * Time.deltaTime;
     }
 
 }

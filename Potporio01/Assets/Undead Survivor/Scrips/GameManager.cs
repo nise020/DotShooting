@@ -43,7 +43,6 @@ public class GameManager : MonoBehaviour
     [SerializeField, Range(0.0f, 100f)] float IteamProbability;//외부에서 조정 가능
     //bool imItem = false;//아이템 생성 여부
     [SerializeField] Transform creatItemTab;
-    [SerializeField] GameObject creatExp;
     int Esyecount = 0;
 
 
@@ -92,7 +91,7 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         runTime();
-        //createEnemy();//활성화 필요
+        createEnemy();//활성화 필요
     }
 
 

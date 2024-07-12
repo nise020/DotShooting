@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1942286110833146635}
   - component: {fileID: 9169039028295034874}
   m_Layer: 7
-  m_Name: Feb_bundle2
+  m_Name: Feb_UnlockSword
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
