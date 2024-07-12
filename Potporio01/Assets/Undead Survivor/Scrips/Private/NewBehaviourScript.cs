@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour
+public class NewBehaviourScript : MonoBehaviour//¸Þ¸ð¿ë
 {
     Camera cam;
     [SerializeField] BoxCollider2D coll;
