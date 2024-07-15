@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,7 +14,6 @@ public class GameManager : MonoBehaviour
     AutoWeaponDron AutoWeaponDron;
     PlayerStatas playerStatas;
     //[Header("오브젝트 들")]
-    ItemManager itemManager;
     //OppositionBullet OpBullet;
 
     public static GameManager Instance;
@@ -28,10 +28,11 @@ public class GameManager : MonoBehaviour
     [Header("몬스터 생성")]
     [SerializeField] public List<GameObject> mobList;//몹 리스트
     [SerializeField] public List<Transform> mobTrs;//몹 상태
-    [SerializeField] public Transform CreatTab;
+    [SerializeField] public Transform CreatTab;//생성탭
     [SerializeField] List<Vector2> createLine;
-    private bool isSpawn = false;
-    public bool MobHPUp = false;
+    public bool MobstatasUp = false;
+    public int PluseHp = 0;
+    GameObject mob;
 
     [Header("적 생성시간")]
     float mobSpawnTimer = 0.0f;// 타이머
@@ -40,21 +41,18 @@ public class GameManager : MonoBehaviour
     [Header("아이템 종류, 확률")]
     [SerializeField] List <GameObject> ItemKind;//아이템 종류
     [SerializeField] List <GameObject> WeaponKind;//아이템 종류
+    [SerializeField] List <GameObject> buffKind;//아이템 종류
     [SerializeField, Range(0.0f, 100f)] float IteamProbability;//외부에서 조정 가능
     //bool imItem = false;//아이템 생성 여부
     [SerializeField] Transform creatItemTab;
-    int Esyecount = 0;
+    int priority = 0;
 
-
-
-    [Header("체력 이미지")]
-    [SerializeField] HpCanvers hpCanvers;
 
     [Header("플레이 시간")]
     [SerializeField] TMP_Text timeText;
-    float minuteTimer = 0f;
+    public float minuteTimer = 0f;
     float minuteTime = 60f;
-    float hour = 0f;
+    public float hour = 0f;
 
     [Header("점수")]
     [SerializeField] TMP_Text scoreText;
@@ -68,6 +66,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMP_InputField IFGameOverMenuRank;
     [SerializeField] Button btnGameOverMenu;
 
+    [Header("게임 시작 안내")]
+    [SerializeField] TMP_Text textStart;
+    bool GameStart = false;
+    bool on = true;
 
     private void Awake()
     {
@@ -75,7 +77,6 @@ public class GameManager : MonoBehaviour
         {
             //UnityEngine.SceneManagement.SceneManager.LoadScene(0);
         }
-
         if (Instance == null)
         {
             Instance = this;//=GameManager가 된다
@@ -86,14 +87,55 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
         //cam = Camera.main;
-    }
 
+    }
+    private void Start()
+    {
+        playerStatas = FindObjectOfType<PlayerStatas>();
+        Color color = textStart.color;
+        color.a = 0f;
+        textStart.color = color;
+    }
     private void Update()
     {
+        gameStart();
+        if (GameStart == false) {return; }
         runTime();
         createEnemy();//활성화 필요
     }
 
+    private void gameStart()
+    {
+        if (textStart==null) { return; }
+        if (on == true)
+        {
+            Color color = textStart.color;
+            color.a += Time.deltaTime/ 1.0f;
+            textStart.color = color;
+            if (color.a > 1)
+            {
+                color.a = 1f;
+                on = false;
+            }
+        }
+        else
+        {
+            Color color = textStart.color;
+            color.a -= Time.deltaTime / 1.0f;
+            textStart.color = color;
+            if (color.a < 0)
+            {
+                color.a = 0f;
+                Destroy(textStart.gameObject);
+            }
+        }
+        if (textStart.color.a <= 0) 
+        {
+            Destroy(textStart.gameObject);
+            GameStart = true;
+        }
+        
+    }
 
     public void ScorePluse(int number)//점수 증가
     {
@@ -103,17 +145,19 @@ public class GameManager : MonoBehaviour
 
     private void runTime()//플레이 타임
     {
-        minuteTimer += 1 * Time.deltaTime;
-        //int count = minuteTimer;
         timeText.text = $"{((int)hour).ToString("d2")}:{((int)minuteTimer).ToString("d2")}";
+
+        if (trsTarget == null) { return; }
+        minuteTimer += 1 * Time.deltaTime;
+
         if (minuteTimer> minuteTime) 
         {
             minuteTimer = 0;
             hour += 1;
+            PluseHp += 1;
             mobSpawnTime -= 0.2f;
-            MobHPUp = true;
+            
         }
-
     }
 
     /// <summary>
@@ -165,9 +209,10 @@ public class GameManager : MonoBehaviour
             int mobcount = mobList.Count;
             int mobiRoad = Random.Range(0, mobcount);
 
-            GameObject go = Instantiate(mobList[mobiRoad], done, Quaternion.identity, CreatTab);
+            mob = Instantiate(mobList[mobiRoad], done, Quaternion.identity, CreatTab);
+            Enemy enemy = mob.GetComponent<Enemy>();
+            enemy.pluse();
             mobSpawnTimer = 0.0f;
-
 
         }
 
@@ -178,59 +223,70 @@ public class GameManager : MonoBehaviour
     /// 아이템 생성 확률 계산기
     /// </summary>
     /// <param name="trs"></param>
-    public void CreateItemCheck(Vector3 trs)
+    public void CreateItemProbability(Vector3 trs)
     {
         float randam = Random.Range(0f, 100f);
-        float WeaponRandam = Random.Range(0f, 100f);
-        if ((IteamProbability > randam)== false && 
-            IteamProbability > WeaponRandam)//장비 아이템,버프
+        if (IteamProbability > randam) 
         {
-            if (Esyecount < 2) //우선 드랍 설정
+            float randamKind = Random.Range(0f, 2f);
+            if (randamKind == 0) 
             {
-                int number = Random.Range(3, 5);
-
-                GameObject Go = Instantiate(WeaponKind[number],
-                    trs, Quaternion.identity, creatItemTab);
-                Esyecount += 1;
-                WeaponKind[number] = null;
-                return;
+                CreateItem(trs, ItemKind, out int value);
+                IteamProbability = 0.0f;
             }
-            int count = WeaponKind.Count;
-            int Number = Random.Range(0, count);
+            else if (randamKind > 0)
+            {
+                if (priority < 2)//우선도 설정
+                {
+                    CreateItem(trs, WeaponKind, out int number);
+                    priority += 1;
+                    WeaponKind.RemoveAt(number);//지우기
+                    return;
+                }
 
-            GameObject go = Instantiate(WeaponKind[Number],
-                trs, Quaternion.identity, creatItemTab);
-            IteamProbability = 0.0f;
-
-        }     
-        else if((IteamProbability > WeaponRandam) == false && 
-            (IteamProbability > randam))//회복용 아이템
-        {
-            int count = ItemKind.Count;
-            int Number = Random.Range(0, count);
-
-            GameObject go = Instantiate(ItemKind[Number],
-                trs, Quaternion.identity, creatItemTab);
-            IteamProbability = 0.0f;
+                CreateItem(trs, buffKind, out int value);
+                IteamProbability = 0.0f;
+            }
+            else //확률업
+            {
+                if (WeaponKind == null) { IteamProbability += 0.5f; }
+                else { IteamProbability += 2f; } 
+            }
         }
-        else { IteamProbability += 0.5f; }//확률업
+
         
     }
+    private void CreateItem(Vector3 trs, List<GameObject> obj, out int value) 
+    {
+        int count = obj.Count;
+        int Number = Random.Range(0, count);
 
+        GameObject go = Instantiate(WeaponKind[Number],
+            trs, Quaternion.identity, creatItemTab);
+        IteamProbability = 0.0f;
+        value = Number;
+    }
     public void rankCheck()
     {
-        List<UserData> RankData =
+        List<UserData> listUserData =
            JsonConvert.DeserializeObject<List<UserData>>
-           (PlayerPrefs.GetString(RankIn.rankKey));//에러뜸
+           (PlayerPrefs.GetString(RankIn.rankKey));
 
 
-        Debug.Log(RankIn.rankKey);
-        Debug.Log(PlayerPrefs.GetString(RankIn.rankKey));
         int rank = -1;
-        int count = RankData.Count;
+        if(listUserData.Count < RankIn.rankCount) 
+        {
+            while (listUserData.Count < RankIn.rankCount)//단순 박복문
+            {
+                listUserData.Add(new UserData() { Name = "None", Score = 0 });
+
+            }
+        }
+        int count = listUserData.Count;
+        
         for (int iNum = 0; iNum < count; iNum++) 
         {
-            UserData userDate = RankData[iNum];
+            UserData userDate = listUserData[iNum];
             if (userDate.Score<score) 
             {
                 rank = iNum;
@@ -264,15 +320,18 @@ public class GameManager : MonoBehaviour
                 newRank.Score = score;
                 newRank.Name = name;
 
-                RankData.Insert(rank, newRank);
-                RankData.RemoveAt(RankData.Count - 1);
-
-                string value = JsonConvert.SerializeObject(RankData);
+                listUserData.Insert(rank, newRank);
+                listUserData.RemoveAt(listUserData.Count - 1);
+                string value = JsonConvert.SerializeObject(listUserData);
                 PlayerPrefs.SetString((RankIn.rankKey), value);
             }
 
-            FaidInOut.Instance.faid = true;
-            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+            FaidInOut.Instance.ActiveFade(true, () =>
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+                FaidInOut.Instance.ActiveFade(false, null);
+            });
+            
         });
         objGameOverMenu.SetActive(true);
     }

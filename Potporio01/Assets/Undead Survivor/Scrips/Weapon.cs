@@ -25,7 +25,7 @@ public class Weapon : MonoBehaviour
 
 
     [Header("검의 데미지")]
-    public int WeaponDamage = 1;
+    [SerializeField] public int WeaponDamage = 1;
     public int WeaponMaxDamage = 4;//미정
     int WeaponDamageMaxcount = 1;
     //UpgaidBool = false;
@@ -33,8 +33,6 @@ public class Weapon : MonoBehaviour
 
     private void Awake()
     {
-        weaponSpriteRd = GetComponent<SpriteRenderer>();
-        trsWeapon = GetComponent<Transform>();
         attakProces = FindObjectOfType<AttakProces>();
     }
 
@@ -43,15 +41,8 @@ public class Weapon : MonoBehaviour
     /// </summary>
     public void WeapondeamageCheack(out int _iNum)//<-class Enemy
     {
-        _iNum = WeaponDamage;
+        _iNum = WeaponDamage + attakProces.Swordcount;
 
-    }
-
-
-    private void Update()
-    {
-        //weaponScale();
-        //weaponUpgraid();
     }
 
     /// <summary>
@@ -75,28 +66,4 @@ public class Weapon : MonoBehaviour
         }
         attakProces.DropSwordUgaid = false;
     }
-
-
-    /// <summary>
-    /// 무기의 크기 증가
-    /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
-    private void weaponScale()
-    {
-        if (attakProces.DropSwordUgaid == true && swordScalecount > swordScaleMaxcount) { return; }
-        if (attakProces.DropSwordUgaid == true && swordScalecount < swordScaleMaxcount)//버튼 누를시 true 예정 
-        {
-            swordScalecount += 1;//조정필요
-
-            Vector3 newScale = trsWeapon.localScale;//변수 지정
-            float pluseScale = -0.5f;//수치
-            newScale.x += -Mathf.Abs(pluseScale);//증감
-            newScale.y += Mathf.Abs(pluseScale);
-            trsWeapon.localScale = newScale;//반영
-
-            WeaponScaleCheack = false;
-        }
-        //swordScalecount += 1;
-    }
-
 }

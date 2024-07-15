@@ -9,11 +9,11 @@ public class AutoWeaponDron : MonoBehaviour
 {
     [SerializeField] Transform trsAuto1;
     Transform trsPos;
-
-    AttakProces attakProces;
+    Weapon weapon;
     [Header("검의 이미지")]
     [SerializeField] List<Sprite> swordSprite;//업그레이드 검의 스프라이트
     [SerializeField] List<SpriteRenderer> weaponSpriteRd;//현재 검의 스프라이트 렌더러
+    [SerializeField] List<GameObject> swords;//검
     //int[] numbers = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     [SerializeField] public bool UpGraidBool = false;//검 이미지 변신 여부
     public int swordUpgraidcount = 1;
@@ -40,16 +40,19 @@ public class AutoWeaponDron : MonoBehaviour
             for (int iNum = 0; iNum < count; iNum++) 
             {
                 weaponSpriteRd[iNum].sprite = swordSprite[weaponSpriteListCount];
+                weapon = swords[iNum].GetComponent<Weapon>();
+                weapon.WeaponDamage += 1;
             }
+            weaponSpriteListCount += 1;
+            swordUpgraidcount += 1;
+
             //foreach (int number in numbers)
             //{
             //    weaponSpriteRd[number].sprite = swordSprite[weaponSpriteListCount];
             //}
             //Sprite sword = swordSprite[weaponSpriteListCount];
             //weaponSpriteRd[weaponSpriteListCount].sprite = sword;
-            Debug.Log($"weaponSpriteRd={weaponSpriteRd[weaponSpriteListCount].sprite}");
-            weaponSpriteListCount += 1;
-            swordUpgraidcount += 1;
+            //Debug.Log($"weaponSpriteRd={weaponSpriteRd[weaponSpriteListCount].sprite}");
         }
     }
 

@@ -14,14 +14,9 @@ public class MoveControll : MonoBehaviour
     public float MaxiumSpeed = 5.0f;
     Vector2 moveDir;
     Animator moveAnim;
-    CapsuleCollider2D cap2d;
     Rigidbody2D rigid;
-    Vector2 moveVe2;
     Transform trsPos;
-    //[Header("자동 공격 Scale")]
-    //[SerializeField] Transform autoHandScale;
-    //[SerializeField] Transform autoFabScale;//오토 공격 상태
-    // Start is called before the first frame update
+
     private void Awake()
     {
         if (trsPos == null)//시작 지점
@@ -35,7 +30,6 @@ public class MoveControll : MonoBehaviour
     {
         rigid = GetComponent<Rigidbody2D>();
         moveAnim = transform.GetComponent<Animator>();
-        cap2d = GetComponent<CapsuleCollider2D>();
     }
 
     // Update is called once per frame
@@ -95,12 +89,7 @@ public class MoveControll : MonoBehaviour
         moveDir.y = Input.GetAxisRaw("Vertical") * moveSpeed;// -1 0 1
 
         rigid.velocity = moveDir;
-        //transform.position += moveDir * Time.deltaTime;
-        //rigid.MovePosition(rigid.position + moveDir * Time.fixedDeltaTime);
-        //참고용
-        //moveDir.y = rigid.velocity.y;
-        //rigid.velocity = moveDir;
-        //MovePosition()
+
 
     }
 

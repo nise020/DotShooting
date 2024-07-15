@@ -8,7 +8,6 @@ public class AttakProces : MonoBehaviour
     Enemy enemy;//몹
     Transform playertransPos;
     PlayerStatas playerStatas;
-    SwordImage swordImage;
     GameManager gameManager;
     AutoWeaponDron autoWeaponDron;
     //BulletManager bulletManager;
@@ -20,12 +19,10 @@ public class AttakProces : MonoBehaviour
     float autoTimer = 0f;
     float AutocoolTime = 5f;
     float AutocoolTimer = 0f;
-    float autoSpeed = 0.5f;
-    float autoAngle = 360.0f;
     [SerializeField] Transform autoHandRoT;
 
     [Header("검 종류")]
-    [SerializeField] List<GameObject> autoObj;//기본 무기(무기 렙업시 이미지 전환)
+    [SerializeField] List<GameObject> autoObj;
 
     [Header("검의 상태")]
      int swordScalecount = 0;
@@ -38,15 +35,13 @@ public class AttakProces : MonoBehaviour
 
     [Header("검의 이미지")]
     public bool DropSwordUgaid = false;//무기 변신
-    int Swordcount =0;//지금의 검
+    public int Swordcount = 0;//지금의 검
 
     [Header("총알 공격")]
     [SerializeField] List<GameObject> bulletKind;//총알 종류
     [SerializeField] Transform creatTab;//총알 생성 탭
-    Transform bulletTrnspos;
     float OpBulletCoolTimer = 0.0f;
     float DefBulletCoolTimer = 0.0f;
-    bool bulletCool = false;
     public bool bulletOn = false;
 
     private void Awake()
@@ -99,7 +94,7 @@ public class AttakProces : MonoBehaviour
     {
         weaponCoolTime();//자동 무기
         OpBulletCoolTime();
-        //DefBulletCoolTime();//기본 총알 
+        DefBulletCoolTime();//기본 총알,On 필수 
     }
 
     /// <summary>
@@ -171,17 +166,16 @@ public class AttakProces : MonoBehaviour
     private void DefBulletCoolTime()//일반 총알생성
     {
         DefBulletCoolTimer += Time.deltaTime;
-        if (DefBulletCoolTimer > 0.5)
+        if (DefBulletCoolTimer > 1)
         {
             creatDefBullet();
-            //AngleCheck();
             DefBulletCoolTimer = 0.0f;
         }
     }
     private void creatDefBullet()//일반 총알생성
     {
-        enemy = FindObjectOfType<Enemy>();
-        if (enemy == null) { return; }//몹이 없을때 사용 안함
+        //enemy = FindObjectOfType<Enemy>();
+        //if (enemy == null) { return; }//몹이 없을때 사용 안함
         Vector3 trspos = transform.position;//내 위치
         if (transform.lossyScale.x == 1)
         {
@@ -198,6 +192,7 @@ public class AttakProces : MonoBehaviour
 
     private void OpBulletCoolTime() //자동으로 맞춰주는 총알생성
     {
+        if (playerStatas.DropOpGun == false) { return; }
         OpBulletCoolTimer += Time.deltaTime;
         if (OpBulletCoolTimer > 1.5)
         {

@@ -2,10 +2,10 @@ using System;
 using System.Collections;
 using System.Net.NetworkInformation;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEditor.PlayerSettings;
+using UnityEngine.UI;
+
+
 
 
 public class Enemy : MonoBehaviour
@@ -21,52 +21,56 @@ public class Enemy : MonoBehaviour
     [SerializeField] MobTag Type;//몹 타입
 
     Weapon weapon;
-    OppositionBullet Opbullet;
-    ItemManager itemManager;
-    PlayerStatas playerStatas;
-    Vector3 moveDir;
-    CapsuleCollider2D mobCollider;
     GameManager gameManager;
-    protected Transform MobTrnspos;
-    protected float beforeX;
+    Transform MobTrnspos;
+    float beforeX;
+    PlayerStatas playerStatas;
 
     [Header("몬스터 정보")]
-    [SerializeField] public int HP;//퍼블릭 전환 가능성 있음
-    protected Animator anim;
-    protected float deathTime = 0.4f;
-    protected float deathTimer = 0f;
-    [SerializeField] protected float moveSpeed = 0.5f;//몹 이동 속도
+    int mobHP = 1;//몬스터 체력
+    Animator anim;
+    float deathTime = 0.3f;
+    float deathTimer = 0f;
+    [SerializeField] public float moveSpeed = 0.5f;//몹 이동 속도
     //public bool Mobnull = false;//수정필요
     int MobDamage = 1;
+    [SerializeField] Sprite hitImg;
+    Color defolteSprit;
+    SpriteRenderer spriteRenderer;
+    
+    [Header("몬스터 스킬")]
     float SkillCoolTimer = 0f;
-    float SkillCoolTime = 1f;
+    float SkillCoolTime = 1.0f;
     float SkillRunTimer = 0f;
-    float SkillRunTime = 1f; 
+    float SkillRunTime = 1.0f; 
     bool FatenOn = true;
+    public bool statasUp = true;
     Vector3 FatenPos;
     [SerializeField] GameObject WhithWeapon;
-    [SerializeField] Transform craetTab;
     [SerializeField] bool CodeOn = true;
-    bool moving = false;
-    Vector3 tarketBe;
+    [SerializeField] bool moving = false;
+    bool skillChasing = false;
+    float skillChasingTimer =0f;
+
+
     [Header("파괴시 점수")]
     [SerializeField] int score;
-    
+    Vector3 trspos;
 
-    protected void Awake()
+    private void Awake()
+    {
+        gameManager = GameManager.Instance;
+        anim = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        defolteSprit = spriteRenderer.color;
+    }
+    private void Start()
     {
         MobTrnspos = transform;
         beforeX = MobTrnspos.position.x;//기존에 x값 확인
-        mobCollider = GetComponent<CapsuleCollider2D>();
-        anim = GetComponent<Animator>();
-    }
-    protected void Start()
-    {
-        gameManager = GameManager.Instance;
         playerStatas = FindObjectOfType<PlayerStatas>();
-        tarketBe = playerStatas.transform.position;
     }
-    protected void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Sword"))
         {
@@ -74,44 +78,38 @@ public class Enemy : MonoBehaviour
 
             if (weapon != null) 
             {
-                int damage = 0;
-                weapon.WeapondeamageCheack(out damage);
-                HP -= damage;
+                weapon.WeapondeamageCheack(out int damage);
+                mobHP -= damage;
+                deathCheck();
             }
-            //deathCheck();
-  
+            
         }
         if (collision.gameObject.layer == LayerMask.NameToLayer("Bullet"))
         {
-            HP -= 1;         
+            mobHP -= 1;
+            deathCheck();
         }
         if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            moving = false;
+            //moving = false;
         }
     }
-    protected void Update()
+    private void Update()
     {
-        hpCheck();
-        deathCheck();
+        //deathCheck();
+        if (playerStatas==null) { return; }
         mobPattern();
         seeCheack();
     }
-    private void hpCheck() 
+    public void pluse() 
     {
-        if (gameManager.MobHPUp == false) { return; }
-        if (gameManager.MobHPUp==true) 
-        {
-            HP += 1;
-            gameManager.MobHPUp = false;
-        }
+        mobHP = mobHP + gameManager.PluseHp;
     }
     private void mobPattern()
     {
-        if (playerStatas == null) {  return; }
         if (Type == MobTag.Defolt) 
         {
-            Mobmoving(CodeOn);
+            Mobmoving(true);
         }
         else if (Type == MobTag.Skull)
         {
@@ -127,35 +125,28 @@ public class Enemy : MonoBehaviour
 
     private void Patern()
     {
-        Vector3 targetpos = playerStatas.transform.position;// position;
-        Vector3 defolt = targetpos - transform.position;
-        if (defolt.x > -2.0f && defolt.y < 2.0f &&
-            defolt.x < 2.0f && defolt.y > -2.0f)
+        gameManager.PlayerTrsPosiTion(out Vector3 playerPos);//출력용
+        Vector3 defolt = playerPos - transform.position;
+        if (Vector3.Distance(playerPos , transform.position) < 2.0f)
         { 
-
             CodeOn = false;
-            SkillCoolTimer += Time.deltaTime;
-            if (SkillCoolTimer > SkillCoolTime)
+            if (FatenOn == true)
             {
-                if (FatenOn == true)
-                {
-                    FatenPos = targetpos;
-                    FatenOn = false;
-                }
-                if (Type == MobTag.Skull) 
-                {
-                    SkullSkill(FatenPos);
-                }
-                else 
-                {
-                    WhiteSkill();
-                }
-                
+                FatenPos = playerPos;
+                FatenOn = false;
+            }
+            if (Type == MobTag.Skull)
+            {
+                SkullSkill(FatenPos);
+            }
+            else
+            {
+                WhiteSkill();
             }
         }
         else
         {
-            SkillRunTimer = 0;
+            //SkillRunTimer = 0;
             SkillCoolTimer = 0;
             CodeOn = true;
             moving = true;
@@ -163,97 +154,61 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private void WhiteSkill()
-    {
-        if (moving==true) 
-        {
-            Vector3 trspos = transform.position;//내 위치
-            GameObject go = Instantiate(WhithWeapon, trspos, 
-                Quaternion.identity, gameManager.CreatTab);
-            moving = false;
-        }
-        
-    }
-
     private void SkullSkill(Vector3 defolt) 
     {
-        Vector3 playerPos;//플레이어 위치 변수명
-        gameManager.PlayerTrsPosiTion(out playerPos);//출력용
-        Vector3 myScale = transform.lossyScale;
-        Vector3 movingTrs = playerPos - transform.position;//거리
-        Vector3 Defolt = new Vector3(0, 0, 0);
-
-
-        Vector3 PlMa = new Vector3(2, -2, 0);
-        Vector3 MaPl = new Vector3(-2, 2, 0);
-        Vector3 PlPl = new Vector3(2, 2, 0);
-        Vector3 MaMa = new Vector3(-2, -2, 0);
-
-        //Vector3 targetPosition = tarketBe;
-        if (moving == true) 
+        if (moving == true)
         {
-            if (myScale.x == 1)
-            {
-                if (movingTrs.x >= 0.0f && movingTrs.y >= 0.0f) //++
-                {
-                    Defolt = (PlPl + playerPos).normalized;
-                }
-                else if (movingTrs.x < 0.0f && movingTrs.y < 0.0f)//--
-                {
-                    Defolt = (MaMa + playerPos).normalized;
-                }
-                else if (movingTrs.x > 0.0f && movingTrs.y < 0.0f)//+-
-                {
-                    Defolt = (MaPl + playerPos).normalized;
-                }
-                else if (movingTrs.x < 0.0f && movingTrs.y > 0.0f)//-+
-                {
-                    Defolt = (PlMa + playerPos).normalized;
-                }
-
-            }
-            else if (myScale.x == -1)
-            {
-                if (movingTrs.x > 0.0f && movingTrs.y > 0.0f) //++
-                {
-                    Defolt = (MaMa + playerPos).normalized;
-                }
-                else if (movingTrs.x <= 0.0f && movingTrs.y <= 0.0f)//--
-                {
-                    Defolt = (PlPl + playerPos).normalized;
-                }
-                else if (movingTrs.x > 0.0f && movingTrs.y < 0.0f)//+-
-                {
-                    Defolt = (PlMa + playerPos).normalized;
-                }
-                else if (movingTrs.x < 0.0f && movingTrs.y > 0.0f)//-+
-                {
-                    Defolt = (MaPl + playerPos).normalized;
-                }
-            }//같음
-
-
-            SkillRunTimer += Time.deltaTime;
             Vector3 direction = defolt - transform.position;
             transform.position += (direction * 2 * Time.deltaTime);
-            if (SkillRunTimer> SkillRunTime) 
+            Debug.Log($"{transform.position},{direction}");
+            SkillRunTimer += Time.deltaTime;
+            if (SkillRunTimer > SkillRunTime)
             {
                 moving = false;
             }
-           
+        }
+        else 
+        {
+            SkillCoolTimer += Time.deltaTime;
+            if (SkillCoolTimer > SkillCoolTime)
+            {
+                FatenOn = true;
+                SkillRunTimer = 0f;
+                SkillCoolTimer = 0f;
+                moving = true;
+            }
+
         }
     }
-    
+    private void WhiteSkill()
+    { 
+        if (moving == true)
+        {
+            Vector3 trspos = transform.position;//내 위치
+            GameObject go = Instantiate(WhithWeapon, trspos,
+                Quaternion.identity, gameManager.CreatTab);
+            moving = false;
+        }
+        else 
+        {
+            SkillRunTimer += Time.deltaTime;
+            if (SkillRunTimer > SkillRunTime) 
+            {
+                SkillRunTimer = 0f;
+                moving = true;
+            }
+        }
+        
+    }
 
     /// <summary>
     /// 플레이어가 있는 방향으로 자동으로 이동합니다
     /// 보스를 추가하면 사용 예정(주의! public임)
     /// </summary>
-    protected virtual void Mobmoving(bool ON) 
+    private void Mobmoving(bool ON) 
     {
-        if (playerStatas == null || ON == false) { return; }
-        Vector3 playerPos;//플레이어 위치 변수명
-        gameManager.PlayerTrsPosiTion(out playerPos);//출력용
+        if (ON == false || mobHP <= 0) { return; }
+        gameManager.PlayerTrsPosiTion(out Vector3 playerPos);//출력용
         Vector3 distance = playerPos - MobTrnspos.position;
         distance.z = 0.0f;
         MobTrnspos.Translate(distance.normalized * moveSpeed * Time.deltaTime);
@@ -265,7 +220,7 @@ public class Enemy : MonoBehaviour
     /// <summary>
     /// 이동하는 방향에 따라서 Scale을 조절해 좌우로 이동하는것 처럼 보이게 한다
     /// </summary>
-    protected void seeCheack()
+    private void seeCheack()
     {
         Vector3 scale = MobTrnspos.localScale;
         float affterX = MobTrnspos.position.x;
@@ -282,23 +237,31 @@ public class Enemy : MonoBehaviour
         beforeX = affterX;
 
     }
-    protected virtual void deathCheck()
+    private void deathCheck()
     {
-        if (HP <= 0)
+        if (mobHP <= 0)
         {
-            //Debug.Log(HP);
             anim.SetBool("Death", true);
             deathTimer += Time.deltaTime;//애니메이션 재생시간
-            //Debug.Log($"deathTimer={deathTimer}");
-            if ((deathTimer > deathTime))
-            {
-                gameManager.CreateItemCheck(transform.position);
-                Destroy(gameObject);
-                gameManager.ScorePluse(score);
-                deathTimer = 0f;
-            }
-   
+            gameManager.CreateItemProbability(transform.position);
+            gameManager.ScorePluse(score);
+            Invoke("destroy", 0.4f); 
         }
+        else 
+        {
+            anim.SetBool("Hit", true);
+            Invoke("DefaultSprite", 0.3f);
+        }
+
+    }
+
+    private void DefaultSprite()
+    {
+        anim.SetBool("Hit", false);
+    }
+    private void destroy() 
+    {
+        Destroy(gameObject);
     }
     /// <summary>
     /// 몹의 데미지

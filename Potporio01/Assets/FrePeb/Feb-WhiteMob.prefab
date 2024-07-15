@@ -122,11 +122,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Type: 2
-  HP: 1
   moveSpeed: 0.5
-  Mobnull: 0
+  hitImg: {fileID: 1151968089, guid: 4104ee12b4d54f54b91b3ba875787837, type: 3}
+  statasUp: 1
   WhithWeapon: {fileID: 7904162442009975892, guid: 55498cd630a4f0542a6c78264a6db99d, type: 3}
-  craetTab: {fileID: 0}
   CodeOn: 1
   score: 300
 --- !u!70 &4056821391991866888

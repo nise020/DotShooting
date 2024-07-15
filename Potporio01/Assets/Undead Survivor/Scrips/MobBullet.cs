@@ -6,17 +6,15 @@ using UnityEngine;
 
 public class MobBullet : MonoBehaviour
 {
-    GameManager gameManager;
     PlayerStatas playerStatas;
-    Enemy enemy;
     Vector3 plPos;
     Vector3 trsPos;
     SpriteRenderer spriteRenderer;
     float runtimer = 0f;
-    float runtime = 5f;
+    float runtime = 3f;
+    bool on = true;
     private void Awake()
     {
-        enemy = FindObjectOfType<Enemy>();
         playerStatas = FindObjectOfType<PlayerStatas>();
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
@@ -38,11 +36,24 @@ public class MobBullet : MonoBehaviour
     }
     private void Update()
     {
+        BulletposRotation();
         BulletposSpeed();
         dilliteRun();
     }
-
-    private void dilliteRun()
+    private void BulletposRotation() //총알방향 회전
+    {
+        if (on == false) { return; }
+        if (on == true)
+        {
+            //Vector3 trsPos = transform.position;
+            Vector2 defolt = plPos - trsPos;
+            float angle = Mathf.Atan2(defolt.y, defolt.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle - 90);//피벗 때문에
+            on = false;
+            // Mathf.Atan2는 x축 기준이다
+        }
+    }
+    private void dilliteRun()//일정시간이 지난후 삭제
     {
         runtimer += Time.deltaTime;
         if (runtimer > runtime) 

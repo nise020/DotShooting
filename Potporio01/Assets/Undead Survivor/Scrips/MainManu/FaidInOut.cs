@@ -1,15 +1,18 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class FaidInOut : MonoBehaviour
 {
     public static FaidInOut Instance;
-    [SerializeField] public bool faid = false;//확인용
+    [SerializeField] public bool fade = false;//확인용
     float fadeTime = 1.0f;
     Image FadeImg;
+    UnityAction action = null;
     private void Awake()
     {
        
@@ -37,17 +40,22 @@ public class FaidInOut : MonoBehaviour
 
     private void faidImgInOut()
     {
-        if (faid == true && FadeImg.color.a < 1)
+        if (fade == true && FadeImg.color.a < 1)//On,밝아지기
         {
             Color color = FadeImg.color;
             color.a += Time.deltaTime / fadeTime;
             if (color.a > 1)
             {
                 color.a = 1;
+                if (action != null)
+                {
+                    action.Invoke();
+                    action = null;
+                }
             }
             FadeImg.color = color;
         }
-        else if (faid == false && FadeImg.color.a > 0) 
+        else if (fade == false && FadeImg.color.a > 0)//Off,어두워지기
         {
             Color color = FadeImg.color;
             color.a -= Time.deltaTime / fadeTime;
@@ -57,5 +65,11 @@ public class FaidInOut : MonoBehaviour
             }
             FadeImg.color = color;
         }
+        FadeImg.raycastTarget = FadeImg.color.a != 0.0f;
+    }
+    public void ActiveFade(bool _fade, UnityAction _action)//= null
+    {
+        fade = _fade;
+        action = _action;
     }
 }

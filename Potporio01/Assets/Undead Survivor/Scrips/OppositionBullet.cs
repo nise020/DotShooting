@@ -44,11 +44,11 @@ public class OppositionBullet : MonoBehaviour
         if (on == false) { return; }
         if (on==true) 
         {
-            //Vector3 trsPos = transform.position;
             Vector2 defolt = enPos - trsPos;
             float angle = Mathf.Atan2(defolt.y, defolt.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.Euler(0, 0, angle-90);//피벗 때문에
             on = false;
+            // Mathf.Atan2는 x축 기준이다
         }
     }
       

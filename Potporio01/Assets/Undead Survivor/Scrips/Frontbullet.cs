@@ -40,7 +40,7 @@ public class Frontbullet : MonoBehaviour
     }
     public void shoot()//앞뒤로 왔다 갔다 함
     {
-        trspos.position += Vector3.right.normalized * 4.0f * Time.deltaTime;
+        trspos.position += Vector3.right * 4.0f * Time.deltaTime;
     }
 
 }

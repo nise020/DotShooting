@@ -68,8 +68,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uB4F1\uB85D"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 5d97b7f326299ce4792084303a32b2f1, type: 2}
-  m_sharedMaterial: {fileID: -3211096539264572335, guid: 5d97b7f326299ce4792084303a32b2f1, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b4158531764a9394c825363430cc7332, type: 2}
+  m_sharedMaterial: {fileID: -207080185485753126, guid: b4158531764a9394c825363430cc7332, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

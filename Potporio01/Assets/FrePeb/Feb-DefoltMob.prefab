@@ -34,7 +34,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7948452585777116939
 SpriteRenderer:
@@ -122,9 +122,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Type: 1
-  HP: 1
   moveSpeed: 0.5
-  Mobnull: 0
+  hitImg: {fileID: -392852972, guid: 1bc6097228993f045852159e71f81d5b, type: 3}
+  statasUp: 1
+  WhithWeapon: {fileID: 0}
+  CodeOn: 1
   score: 100
 --- !u!70 &6956840005411605861
 CapsuleCollider2D:
