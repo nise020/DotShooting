@@ -18,12 +18,8 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance;
 
-    [Header("카메라 위치")]
-    [SerializeField] Transform camTrs;
-
     [Header("플레이어 위치")]
     [SerializeField] public Transform trsTarget;
-     Camera cam;
 
     [Header("몬스터 생성")]
     [SerializeField] public List<GameObject> mobList;//몹 리스트
@@ -47,6 +43,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] Transform creatItemTab;
     int priority = 0;
 
+    [Header("스킬 버튼")]
+    [SerializeField] Button skillbtn;
+    [SerializeField] Image skillCoolImg;
+    float skillCoolTimer = 0f;
+    float skillCoolTime = 5f;
+    bool skillbtnFill = true;
+    bool skillBulletOn = false;
 
     [Header("플레이 시간")]
     [SerializeField] TMP_Text timeText;
@@ -86,8 +89,6 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        //cam = Camera.main;
-
     }
     private void Start()
     {
@@ -95,13 +96,60 @@ public class GameManager : MonoBehaviour
         Color color = textStart.color;
         color.a = 0f;
         textStart.color = color;
+        skillbtn.onClick.AddListener(() => { skillbtn.interactable = false; });
+        skillbtn.interactable = false;
+        SkillCoolStart();
     }
     private void Update()
     {
         gameStart();
         if (GameStart == false) {return; }
         runTime();
-        createEnemy();//활성화 필요
+        skiilCool();
+        //createEnemy();//활성화 필요
+        
+    }
+    private void SkillCoolStart() 
+    {
+        Color color = skillCoolImg.color;
+        color.a = 0f;
+        skillCoolImg.color = color;
+    }
+    private void SkillCoolRuning()
+    {
+        Color color = skillCoolImg.color;
+        color.a += Time.deltaTime / skillCoolTime;
+        if (color.a > 1)
+        {
+            color.a = 1;
+        }
+        skillCoolImg.color = color;
+    }
+    private void skiilCool()
+    {
+        if (skillbtn.interactable == true) { return; }
+        if (skillbtn.interactable == false)
+        {
+            //skillBulletOn = true;//5초 정도 유지
+            if (skillbtnFill == true) 
+            {
+                SkillCoolStart();
+                skillbtnFill = false;
+            }
+
+            SkillCoolRuning();
+
+            skillCoolTimer += Time.deltaTime;
+            if (skillCoolTimer > skillCoolTime && skillCoolImg.color.a <= 1f)
+            {
+                skillCoolTimer = 0f;
+                skillbtn.interactable = true;
+                skillbtnFill = true;
+            }
+
+        }
+        
+        
     }
 
     private void gameStart()

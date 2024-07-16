@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -95,7 +96,15 @@ public class AttakProces : MonoBehaviour
         weaponCoolTime();//자동 무기
         OpBulletCoolTime();
         DefBulletCoolTime();//기본 총알,On 필수 
+        //skillBulletCoolTime();
     }
+
+    public void skillBulletCoolTime()//스킬 총알 생성
+    {
+        GameObject go = Instantiate(bulletKind[3], transform.position,
+            Quaternion.identity, creatTab.transform);
+    }
+
 
     /// <summary>
     /// 무기의 쿨타임

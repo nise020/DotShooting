@@ -160,7 +160,6 @@ public class Enemy : MonoBehaviour
         {
             Vector3 direction = defolt - transform.position;
             transform.position += (direction * 2 * Time.deltaTime);
-            Debug.Log($"{transform.position},{direction}");
             SkillRunTimer += Time.deltaTime;
             if (SkillRunTimer > SkillRunTime)
             {

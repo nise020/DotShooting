@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class BackBullet : MonoBehaviour
 {
-
+    GameManager gameManager;
     Transform trspos;
     // Start is called before the first frame update
     void Start()
     {
         trspos = transform;
+        gameManager = GameManager.Instance;
     }
     private void OnBecameInvisible()//카메라 밖에 사라졌을때
     {
