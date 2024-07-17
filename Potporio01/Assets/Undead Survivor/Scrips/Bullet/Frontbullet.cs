@@ -38,7 +38,7 @@ public class Frontbullet : MonoBehaviour
         transform.localRotation = Quaternion.Euler(0, 0, age);
         shoot();
     }
-    public void shoot()//앞뒤로 왔다 갔다 함
+    public void shoot()
     {
         trspos.position += Vector3.right * 4.0f * Time.deltaTime;
     }

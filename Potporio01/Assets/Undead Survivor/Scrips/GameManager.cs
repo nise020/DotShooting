@@ -49,7 +49,8 @@ public class GameManager : MonoBehaviour
     float skillCoolTimer = 0f;
     float skillCoolTime = 5f;
     bool skillbtnFill = true;
-    bool skillBulletOn = false;
+    public bool skillBulletOn = false;
+    float skillBulletTimer = 0f;
 
     [Header("플레이 시간")]
     [SerializeField] TMP_Text timeText;
@@ -128,15 +129,20 @@ public class GameManager : MonoBehaviour
     private void skiilCool()
     {
         if (skillbtn.interactable == true) { return; }
-        if (skillbtn.interactable == false)
+        if (skillbtn.interactable == false)//타이머 등 수정필요
         {
-            //skillBulletOn = true;//5초 정도 유지
             if (skillbtnFill == true) 
             {
                 SkillCoolStart();
                 skillbtnFill = false;
             }
-
+            skillBulletOn = true;//5초 정도 유지
+            skillBulletTimer += Time.deltaTime;
+            if (skillBulletTimer > 5.0f) 
+            {
+                skillBulletOn = false;
+                skillBulletTimer = 0f;
+            }
             SkillCoolRuning();
 
             skillCoolTimer += Time.deltaTime;

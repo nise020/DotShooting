@@ -40,9 +40,11 @@ public class AttakProces : MonoBehaviour
 
     [Header("총알 공격")]
     [SerializeField] List<GameObject> bulletKind;//총알 종류
+    [SerializeField] Transform ShootPos;//발사될 위치
     [SerializeField] Transform creatTab;//총알 생성 탭
     float OpBulletCoolTimer = 0.0f;
     float DefBulletCoolTimer = 0.0f;
+    float SkillBulletCoolTimer = 0.0f;
     public bool bulletOn = false;
 
     private void Awake()
@@ -96,13 +98,20 @@ public class AttakProces : MonoBehaviour
         weaponCoolTime();//자동 무기
         OpBulletCoolTime();
         DefBulletCoolTime();//기본 총알,On 필수 
-        //skillBulletCoolTime();
+        skillBulletCoolTime(gameManager.skillBulletOn);
     }
 
-    public void skillBulletCoolTime()//스킬 총알 생성
+    public void skillBulletCoolTime(bool value)//스킬 총알 생성
     {
-        GameObject go = Instantiate(bulletKind[3], transform.position,
+        if (value == false) { return;  }
+        SkillBulletCoolTimer += Time.deltaTime;
+        if (SkillBulletCoolTimer>0.3) 
+        {
+            GameObject go = Instantiate(bulletKind[3], ShootPos.position,
             Quaternion.identity, creatTab.transform);
+            SkillBulletCoolTimer = 0f;
+        }
+        
     }
 
 

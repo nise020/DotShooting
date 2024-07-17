@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2010956937482198840}
   - component: {fileID: 4948805960176989208}
-  - component: {fileID: 4584860591890669329}
+  - component: {fileID: 6429267788565467821}
   m_Layer: 17
   m_Name: Fab_SkillBullet
   m_TagString: Untagged
@@ -31,7 +31,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!212 &4948805960176989208
 SpriteRenderer:
@@ -85,7 +85,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &4584860591890669329
+--- !u!114 &6429267788565467821
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -94,6 +94,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 8856786224492553321}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 799e481369ab4104eb8d815fe83bd350, type: 3}
+  m_Script: {fileID: 11500000, guid: 51d47e204b8a156478f1a2a4e1139a84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

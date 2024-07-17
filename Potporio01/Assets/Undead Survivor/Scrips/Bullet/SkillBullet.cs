@@ -1,0 +1,28 @@
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEngine;
+using static UnityEngine.RuleTile.TilingRuleOutput;
+
+public class SkillBullet : MonoBehaviour
+{
+    float Speed = 5f;
+    Vector3 defolt;
+    GameObject bullet;
+    void Start()
+    {
+        GameManager gameManager = GameManager.Instance;
+        transform.parent = null;
+        transform.localScale = gameManager.trsTarget.localScale;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        int count = transform.childCount;
+        if (count == 0) 
+        {
+            Destroy(gameObject);
+        }
+    }
+}

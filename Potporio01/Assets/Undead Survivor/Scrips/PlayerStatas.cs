@@ -68,7 +68,7 @@ public class PlayerStatas : MonoBehaviour
         }
         else if (collision.gameObject.layer == LayerMask.NameToLayer("Heal"))//item
         {
-            if (NowHp < MaximumHP)//힐
+            if (NowHp < MaximumHP)//힐+
             {
                 NowHp += 1;
                 //GameManager.Instance.Hpcheck(NowHp, MaximumHP);
@@ -76,7 +76,7 @@ public class PlayerStatas : MonoBehaviour
             }
             else { return; }
         }
-        else if (collision.gameObject.layer == LayerMask.NameToLayer("Speed"))//스피드
+        else if (collision.gameObject.layer == LayerMask.NameToLayer("Speed"))//스피드UP
         {
             moveControll = GetComponent<MoveControll>();
             if (moveControll.MaxiumSpeed > moveControll.moveSpeed)
@@ -85,17 +85,17 @@ public class PlayerStatas : MonoBehaviour
             }
             else { return; }
         }
-        else if (collision.gameObject.layer == LayerMask.NameToLayer("OpGun"))//
+        else if (collision.gameObject.layer == LayerMask.NameToLayer("OpGun"))//자동 총알 해금
         {
             DropOpGun = true;
 
         }
-        else if (collision.gameObject.layer == LayerMask.NameToLayer("Sword"))//
+        else if (collision.gameObject.layer == LayerMask.NameToLayer("Sword"))//검 해금
         {
             DropSword = true;
 
         }
-        else if (collision.gameObject.layer == LayerMask.NameToLayer("MaxHpUp"))//
+        else if (collision.gameObject.layer == LayerMask.NameToLayer("MaxHpUp"))//최대체력Up
         {
             MaximumHP += 1;
         }

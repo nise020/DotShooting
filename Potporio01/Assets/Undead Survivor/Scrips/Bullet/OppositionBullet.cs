@@ -55,7 +55,8 @@ public class OppositionBullet : MonoBehaviour
     private void BulletposSpeed()
     {
         if (playerStatas == null) { return;  }
-
+        int count = enemy.gameObject.layer;
+        //GameObject go = Random.Range(0, count);
         Vector3 distance = (enPos - trsPos).normalized;
         transform.position += distance * 5.0f * Time.deltaTime;
     }
