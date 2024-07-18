@@ -27,7 +27,7 @@ public class Enemy : MonoBehaviour
     PlayerStatas playerStatas;
 
     [Header("몬스터 정보")]
-    int mobHP = 1;//몬스터 체력
+    [SerializeField] int mobHP = 1;//몬스터 체력
     Animator anim;
     float deathTime = 0.3f;
     float deathTimer = 0f;
@@ -66,6 +66,7 @@ public class Enemy : MonoBehaviour
     }
     private void Start()
     {
+        pluse();
         MobTrnspos = transform;
         beforeX = MobTrnspos.position.x;//기존에 x값 확인
         playerStatas = FindObjectOfType<PlayerStatas>();
@@ -101,7 +102,7 @@ public class Enemy : MonoBehaviour
         mobPattern();
         seeCheack();
     }
-    public void pluse() 
+    private void pluse() //생성시 체력 확인
     {
         mobHP = mobHP + gameManager.PluseHp;
     }

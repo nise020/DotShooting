@@ -103,9 +103,9 @@ public class AttakProces : MonoBehaviour
 
     public void skillBulletCoolTime(bool value)//스킬 총알 생성
     {
-        if (value == false) { return;  }
+        if (value == false) { return; }
         SkillBulletCoolTimer += Time.deltaTime;
-        if (SkillBulletCoolTimer>0.3) 
+        if (SkillBulletCoolTimer > 0.2) 
         {
             GameObject go = Instantiate(bulletKind[3], ShootPos.position,
             Quaternion.identity, creatTab.transform);

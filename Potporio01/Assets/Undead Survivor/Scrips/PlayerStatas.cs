@@ -12,6 +12,7 @@ public class PlayerStatas : MonoBehaviour
     CapsuleCollider2D capsuleCollider2D;
     [Header("플레이어 정보")]
     [SerializeField, Range(1, 10)] int plLevel = 1;//레벨,화면에 표시되게 하고 싶다
+    public float beforHp;
     public float NowHp = 5;//시각적으로 보이는 현재 체력
     public float MaximumHP = 5;//최대 체력
     [SerializeField] int score = 0;//점수
@@ -37,7 +38,6 @@ public class PlayerStatas : MonoBehaviour
         gameManager = GameManager.Instance;
         spriteRenderer =GetComponent<SpriteRenderer>();
         capsuleCollider2D = GetComponent<CapsuleCollider2D>();
-
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

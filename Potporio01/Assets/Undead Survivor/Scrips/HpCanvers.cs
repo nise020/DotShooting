@@ -6,8 +6,10 @@ using UnityEngine.UI;
 public class HpCanvers : MonoBehaviour
 {
     [SerializeField] Image PlayerHPImg;
+    [SerializeField] Image skillImg;
     PlayerStatas playerStatas;
     GameManager gameManager;
+    Transform childtrs;
     //float nowHP;
     //float maxHP;
     private void Awake()
@@ -18,12 +20,14 @@ public class HpCanvers : MonoBehaviour
     {
         gameManager = GameManager.Instance;
         playerStatas = FindObjectOfType<PlayerStatas>();
+        int count  = transform.childCount;
+
     }
     private void Update()
     {
+        HpPos();
         HpBar();
         CheckHp();
-        HpPos();
     }
 
     /// <summary>
@@ -31,24 +35,24 @@ public class HpCanvers : MonoBehaviour
     /// </summary>
     private void HpPos() 
     {
-        //playerStatas = FindObjectOfType<PlayerStatas>();
-        Vector2 posY = playerStatas.transform.position;
-        posY.y += 1;
-        transform.position = posY;
+        if (playerStatas == null) { return; }
+        gameManager.PlayerTrsPosiTion(out Vector3 pos);
+        pos.y += 1;
+        transform.position = pos;  
     }
-    public void HpBar(/*float now, float max*/)
+    public void HpBar()
     {
-        //playerStatas = FindObjectOfType<PlayerStatas>();
        float now = playerStatas.NowHp;
        float max = playerStatas.MaximumHP;
         PlayerHPImg.fillAmount = now / max ;
     }
     private void CheckHp() 
     {
-        if (PlayerHPImg.fillAmount == 0) 
+        if (PlayerHPImg.fillAmount < 0.1) 
         {
             Destroy(gameObject);
         }
 
     }
+
 }

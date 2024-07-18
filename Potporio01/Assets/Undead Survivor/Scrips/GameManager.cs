@@ -12,10 +12,14 @@ public class GameManager : MonoBehaviour
     Enemy enemy;
     Item item;
     AutoWeaponDron AutoWeaponDron;
-    PlayerStatas playerStatas;
-    //[Header("오브젝트 들")]
-    //OppositionBullet OpBullet;
-
+    //PlayerStatas playerStatas;
+    
+    //PlayerStatas player;
+    //public PlayerStatas _Player
+    //{
+    //    get { return player; }
+    //    set { player = value; }
+    //}
     public static GameManager Instance;
 
     [Header("플레이어 위치")]
@@ -29,6 +33,9 @@ public class GameManager : MonoBehaviour
     public bool MobstatasUp = false;
     public int PluseHp = 0;
     GameObject mob;
+    int mobSpowncount = 0;
+    int mobSpownMaxcount = 8;
+
 
     [Header("적 생성시간")]
     float mobSpawnTimer = 0.0f;// 타이머
@@ -44,13 +51,16 @@ public class GameManager : MonoBehaviour
     int priority = 0;
 
     [Header("스킬 버튼")]
+    [SerializeField] Image skillImg;
     [SerializeField] Button skillbtn;
     [SerializeField] Image skillCoolImg;
     float skillCoolTimer = 0f;
-    float skillCoolTime = 5f;
+    float skillCoolTime = 10f;//처음에 10초
     bool skillbtnFill = true;
     public bool skillBulletOn = false;
     float skillBulletTimer = 0f;
+    float skillBulletTime = 5f;
+    float skillCoolBulletTime = 10f;
 
     [Header("플레이 시간")]
     [SerializeField] TMP_Text timeText;
@@ -93,13 +103,18 @@ public class GameManager : MonoBehaviour
     }
     private void Start()
     {
-        playerStatas = FindObjectOfType<PlayerStatas>();
+        //playerStatas = FindObjectOfType<PlayerStatas>();
         Color color = textStart.color;
         color.a = 0f;
         textStart.color = color;
-        skillbtn.onClick.AddListener(() => { skillbtn.interactable = false; });
+
+        skillbtn.onClick.AddListener(skillOn);
         skillbtn.interactable = false;
-        SkillCoolStart();
+        skillCoolImg.color = color;
+        skillImg.fillAmount = 0;
+
+        //skillImg.rectTransform.position.x = 60f;
+        //skillImg.rectTransform.position = new Vector2(60,0);
     }
     private void Update()
     {
@@ -107,60 +122,78 @@ public class GameManager : MonoBehaviour
         if (GameStart == false) {return; }
         runTime();
         skiilCool();
-        //createEnemy();//활성화 필요
+        createEnemy();//활성화 필요
         
     }
-    private void SkillCoolStart() 
+    private void skillOn() 
     {
-        Color color = skillCoolImg.color;
-        color.a = 0f;
-        skillCoolImg.color = color;
+        skillbtn.interactable = false;
+        skillBulletOn = true;
     }
-    private void SkillCoolRuning()
+    private void SkillCoolStart()//스킬 지속중일때 컬러 
     {
         Color color = skillCoolImg.color;
-        color.a += Time.deltaTime / skillCoolTime;
+        color.a -= Time.deltaTime / skillBulletTime; ;
+        if (color.a < 0)
+        {
+           color.a = 0;
+        }
+        skillCoolImg.color = color;
+        if (skillCoolImg.color.a <= 0) { return; }
+    }
+    private void SkillCoolRuning()//시각적으로 보이는 쿨타임
+    {
+        Color color = skillCoolImg.color;
+        color.a += Time.deltaTime / skillCoolBulletTime;
         if (color.a > 1)
         {
             color.a = 1;
         }
         skillCoolImg.color = color;
+        if (skillCoolImg.color.a > 1) { return; }
     }
-    private void skiilCool()
+
+    private void skiilCool()//스킬 쿨 타임 조절
     {
-        if (skillbtn.interactable == true) { return; }
+        if (skillbtn.interactable == true || trsTarget == null) { return; }
+
         if (skillbtn.interactable == false)//타이머 등 수정필요
         {
-            if (skillbtnFill == true) 
+            skillBulletTimer += Time.deltaTime;
+            if (skillBulletTimer > skillBulletTime)//스킬 지속시간
+            {
+                skillBulletOn = false;//스킬버튼
+            }
+
+            if (skillBulletOn == true)//스킬 On
             {
                 SkillCoolStart();
-                skillbtnFill = false;
+                skillImg.fillAmount -= Time.deltaTime / skillBulletTime;
+                //skillImg.fillAmount = 1 - skillBulletTimer / skillBulletTime;
             }
-            skillBulletOn = true;//5초 정도 유지
-            skillBulletTimer += Time.deltaTime;
-            if (skillBulletTimer > 5.0f) 
+            else//skillBulletOn == false,스킬 Off
             {
-                skillBulletOn = false;
-                skillBulletTimer = 0f;
+                SkillCoolRuning();
+                skillImg.fillAmount += Time.deltaTime / skillCoolBulletTime;
             }
-            SkillCoolRuning();
 
             skillCoolTimer += Time.deltaTime;
-            if (skillCoolTimer > skillCoolTime && skillCoolImg.color.a <= 1f)
+            if (skillCoolTimer > skillCoolTime && skillCoolImg.color.a <= 1f)//스킬 쿨타임
             {
+                skillCoolTime = 15f;//이후에는 15초 유지
                 skillCoolTimer = 0f;
                 skillbtn.interactable = true;
-                skillbtnFill = true;
+                skillBulletTimer = 0f;
             }
-
+            
         }
         
-        
+
     }
 
-    private void gameStart()
+    private void gameStart()//게임 시작
     {
-        if (textStart==null) { return; }
+        if (textStart == null) { return; }
         if (on == true)
         {
             Color color = textStart.color;
@@ -210,7 +243,7 @@ public class GameManager : MonoBehaviour
             hour += 1;
             PluseHp += 1;
             mobSpawnTime -= 0.2f;
-            
+            mobSpownMaxcount += 3;
         }
     }
 
@@ -219,16 +252,19 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void createEnemy()
     {
-        if (trsTarget == null) { return; }
+        if (trsTarget == null || mobSpowncount >= mobSpownMaxcount)//타이머가 스폰 쿨타임을 넘었을 경우
+        { return; }
 
         mobSpawnTimer += Time.deltaTime;//타이머 ON
-        if (mobSpawnTimer > mobSpawnTime)//타이머가 스폰 쿨타임을 넘었을 경우
+        if (mobSpawnTimer > mobSpawnTime && mobSpowncount <= mobSpownMaxcount)//타이머가 스폰 쿨타임을 넘었을 경우
         {
+            mobSpawnTimer = 0.0f;
+            mobSpowncount += 1;
             int Iroad = Random.Range(0, 4);//스폰할 위치의 경계선 선정
             //Random.Range(1, 4)1,2,3 
 
             Vector2 playerPos = trsTarget.position;//player 위치
-            Vector2 done = new Vector2(0,0); //디폴트 생성
+            Vector2 done = new Vector2(0, 0); //디폴트 생성
 
             float Randamx = Random.Range(-8.0f, 8.0f);//x값 랜덤위치 스폰
             float Randamy = Random.Range(-4.0f, 4.0f);//y값 랜덤위치 스폰
@@ -264,12 +300,10 @@ public class GameManager : MonoBehaviour
             int mobiRoad = Random.Range(0, mobcount);
 
             mob = Instantiate(mobList[mobiRoad], done, Quaternion.identity, CreatTab);
-            Enemy enemy = mob.GetComponent<Enemy>();
-            enemy.pluse();
-            mobSpawnTimer = 0.0f;
+            //Enemy enemy = mob.GetComponent<Enemy>();
+            //enemy.pluse();
 
         }
-
     }
 
 
@@ -310,6 +344,12 @@ public class GameManager : MonoBehaviour
 
         
     }
+    /// <summary>
+    /// 아이템 생성
+    /// </summary>
+    /// <param name="위치"></param>
+    /// <param name="오브젝트 List"></param>
+    /// <param name="value"></param>
     private void CreateItem(Vector3 trs, List<GameObject> obj, out int value) 
     {
         int count = obj.Count;
@@ -407,20 +447,20 @@ public class GameManager : MonoBehaviour
         }
         return pos;
     }
-
+    
     /// <summary>
     /// player의 transform에 대한 정보를 밖으로 꺼낸다
     /// </summary>
     /// <param name="_pos"></param>
     public void PlayerTrsPosiTion(out Vector3 _pos)
     {
-        _pos = trsTarget.position;
+        _pos = trsTarget.transform.position;
     }
 
-    public void EnomyTrsPosiTion(out Vector3 _pos)
-    {
-        _pos = mobList[1].transform.position;
-    }
+    //public void EnomyTrsPosiTion(out Vector3 _pos)
+    //{
+    //    _pos = mobList[1].transform.position;
+    //}
 
 
 }
