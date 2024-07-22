@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -33,7 +34,7 @@ public class GameManager : MonoBehaviour
     public bool MobstatasUp = false;
     public int PluseHp = 0;
     GameObject mob;
-    int mobSpowncount = 0;
+     public int mobSpowncount = 0;
     int mobSpownMaxcount = 8;
 
 
@@ -70,7 +71,7 @@ public class GameManager : MonoBehaviour
 
     [Header("점수")]
     [SerializeField] TMP_Text scoreText;
-    int score;
+    int score = 0;
 
     [Header("게임오버메뉴")]
     [SerializeField] GameObject objGameOverMenu;
@@ -85,22 +86,31 @@ public class GameManager : MonoBehaviour
     bool GameStart = false;
     bool on = true;
 
+    [Header("일시정지")]
+    [SerializeField] Button StopBtn;
+    [SerializeField] GameObject stopImg;
+    [SerializeField] Button continuBtn;
+    [SerializeField] Button exitBtn;
+    [SerializeField] public bool objStop = false;
+
+
     private void Awake()
     {
-        if (RankIn.isStating == false)
+        if (RankIn.isStating == false)//메뉴에서 시작 하기
         {
-            //UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
         }
         if (Instance == null)
         {
             Instance = this;//=GameManager가 된다
-            DontDestroyOnLoad(gameObject);
         }
         else 
         {
             Destroy(gameObject);
         }
+
     }
+
     private void Start()
     {
         //playerStatas = FindObjectOfType<PlayerStatas>();
@@ -113,11 +123,37 @@ public class GameManager : MonoBehaviour
         skillCoolImg.color = color;
         skillImg.fillAmount = 0;
 
+        stopImg.SetActive(false);
+        StopBtn.onClick.AddListener(StopBtnOn);
+        continuBtn.onClick.AddListener(continuBtnOn);
+        exitBtn.onClick.AddListener(exitGame);
         //skillImg.rectTransform.position.x = 60f;
         //skillImg.rectTransform.position = new Vector2(60,0);
     }
+    private void continuBtnOn()
+    {
+        stopImg.SetActive(false);
+        objStop = false;
+    }
+    private void StopBtnOn() 
+    {
+        stopImg.SetActive(true);
+        objStop = true; 
+    }
+    private void exitGame() 
+    {
+        stopImg.SetActive(false);
+        objStop = false;
+        FaidInOut.Instance.ActiveFade(true, () =>
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+            FaidInOut.Instance.ActiveFade(false, null);
+        });
+
+    }
     private void Update()
     {
+        if (objStop==true) { return; }
         gameStart();
         if (GameStart == false) {return; }
         runTime();

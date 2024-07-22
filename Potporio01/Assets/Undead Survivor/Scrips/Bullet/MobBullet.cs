@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class MobBullet : MonoBehaviour
 {
+    GameManager gameManager;
     PlayerStatas playerStatas;
     Vector3 plPos;
     Vector3 trsPos;
@@ -15,7 +16,8 @@ public class MobBullet : MonoBehaviour
     bool on = true;
     private void Awake()
     {
-        playerStatas = FindObjectOfType<PlayerStatas>();
+        gameManager = GameManager.Instance;
+        //playerStatas = FindObjectOfType<PlayerStatas>();
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
     private void OnBecameInvisible()//카메라 밖에 사라졌을때
@@ -31,11 +33,12 @@ public class MobBullet : MonoBehaviour
     }
     void Start()
     {
-        plPos = playerStatas.transform.position;// position;
+        gameManager.PlayerTrsPosiTion(out plPos);
         trsPos = transform.position;
     }
     private void Update()
     {
+        if (gameManager.objStop == true) { return; }
         BulletposRotation();
         BulletposSpeed();
         dilliteRun();

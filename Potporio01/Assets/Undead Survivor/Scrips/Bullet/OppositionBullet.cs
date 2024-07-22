@@ -5,11 +5,12 @@ using UnityEngine;
 
 public class OppositionBullet : MonoBehaviour
 {
-    //GameManager gameManager;
+    GameManager gameManager;
     PlayerStatas playerStatas;
     Enemy enemy;
     Vector3 enPos;
     Vector3 trsPos;
+    Vector3 plPos;
     int bulletDamage = 1;
     bool on = true;
 
@@ -26,8 +27,10 @@ public class OppositionBullet : MonoBehaviour
     }
     void Start()
     {
+        gameManager = GameManager.Instance;
+        gameManager.PlayerTrsPosiTion(out plPos);
         enemy = FindObjectOfType<Enemy>();
-        playerStatas = FindObjectOfType<PlayerStatas>();
+       // playerStatas = FindObjectOfType<PlayerStatas>();
        // gameManager = GameManager.Instance;
 
         trsPos = transform.position;
@@ -36,6 +39,7 @@ public class OppositionBullet : MonoBehaviour
     }
     private void Update()
     {
+        if (gameManager.objStop == true) { return; }
         BulletposRotation();
         BulletposSpeed();
     }
@@ -54,8 +58,7 @@ public class OppositionBullet : MonoBehaviour
       
     private void BulletposSpeed()
     {
-        if (playerStatas == null) { return;  }
-        int count = enemy.gameObject.layer;
+        if (plPos == null) { return; }
         //GameObject go = Random.Range(0, count);
         Vector3 distance = (enPos - trsPos).normalized;
         transform.position += distance * 5.0f * Time.deltaTime;

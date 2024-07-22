@@ -6,14 +6,12 @@ using UnityEngine;
 public class Frontbullet : MonoBehaviour
 {
     GameManager gameManager;
-    PlayerStatas playerStatas;
     Transform trspos;
     // Start is called before the first frame update
     void Start()
     {
-        playerStatas = FindObjectOfType<PlayerStatas>();
         trspos = transform;
-        //gameManager = FindObjectOfType<GameManager>();
+        gameManager = GameManager.Instance;
     }
     private void OnBecameInvisible()//카메라 밖에 사라졌을때
     {
@@ -29,6 +27,7 @@ public class Frontbullet : MonoBehaviour
     
     void Update()
     {
+        if (gameManager.objStop == true) { return; }
         AngleCheck();
     }
     private void AngleCheck()

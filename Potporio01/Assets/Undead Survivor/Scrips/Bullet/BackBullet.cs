@@ -26,6 +26,7 @@ public class BackBullet : MonoBehaviour
 
     void Update()
     {
+        if (gameManager.objStop == true) { return; }
         AngleCheck();
     }
     private void AngleCheck()

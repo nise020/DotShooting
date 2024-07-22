@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    GameManager gameManager;
     float Speed = 5f;
+    private void Start()
+    {
+        gameManager = GameManager.Instance;
+    }
     private void OnBecameInvisible()//카메라 밖에 사라졌을때
     {
         Destroy(gameObject);
@@ -20,6 +25,7 @@ public class Bullet : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (gameManager.objStop == true) { return; }
         transform.position += transform.up * Speed * Time.deltaTime;
     }
 }

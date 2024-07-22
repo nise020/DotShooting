@@ -20,11 +20,11 @@ public class HpCanvers : MonoBehaviour
     {
         gameManager = GameManager.Instance;
         playerStatas = FindObjectOfType<PlayerStatas>();
-        int count  = transform.childCount;
 
     }
     private void Update()
     {
+        if (gameManager.objStop == true) { return; }
         HpPos();
         HpBar();
         CheckHp();

@@ -95,6 +95,7 @@ public class AttakProces : MonoBehaviour
     }
     void Update()
     {
+        if (gameManager.objStop == true) { return; }
         weaponCoolTime();//자동 무기
         OpBulletCoolTime();
         DefBulletCoolTime();//기본 총알,On 필수 

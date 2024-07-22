@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 public class MoveControll : MonoBehaviour
 {
     PlayerStatas playerStatas;
+    GameManager gameManager;
     /// <summary>
     /// 플레이어 이동속도(버프 부여 가능)
     /// </summary>
@@ -30,14 +31,15 @@ public class MoveControll : MonoBehaviour
     {
         rigid = GetComponent<Rigidbody2D>();
         moveAnim = transform.GetComponent<Animator>();
+        gameManager = GameManager.Instance;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (gameManager.objStop == true) { return; }
         runAnim();
-        seeCheack();
-        
+        seeCheack(); 
     }
     private void FixedUpdate()
     {

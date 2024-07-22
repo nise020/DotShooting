@@ -19,9 +19,7 @@ public class FaidInOut : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);//루트 게임오브젝트만 넣어줘야 한다
-            //삭제가 안됨
-            //DontDestroyOnLoad 씬을 에디티브로 생성 후 거기에 넣어줌
+            DontDestroyOnLoad(gameObject);
         }
         else
         {

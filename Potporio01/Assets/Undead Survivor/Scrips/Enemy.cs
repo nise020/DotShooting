@@ -97,7 +97,7 @@ public class Enemy : MonoBehaviour
     }
     private void Update()
     {
-        //deathCheck();
+        if (gameManager.objStop == true) { return; }
         if (playerStatas==null) { return; }
         mobPattern();
         seeCheack();
