@@ -87,13 +87,19 @@ public class PlayerStatas : MonoBehaviour
         }
         else if (collision.gameObject.layer == LayerMask.NameToLayer("OpGun"))//자동 총알 해금
         {
-            DropOpGun = true;
-
+            if (DropOpGun == false)
+            {
+                DropOpGun = true;
+                gameManager.WeaponKind.RemoveAt(gameManager.WeaponKindNmber);
+            }
         }
         else if (collision.gameObject.layer == LayerMask.NameToLayer("Sword"))//검 해금
         {
-            DropSword = true;
-
+            if (DropSword == false) 
+            { 
+                DropSword = true;
+                gameManager.WeaponKind.RemoveAt(gameManager.WeaponKindNmber);
+            }        
         }
         else if (collision.gameObject.layer == LayerMask.NameToLayer("MaxHpUp"))//최대체력Up
         {

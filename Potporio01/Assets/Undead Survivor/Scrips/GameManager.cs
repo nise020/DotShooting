@@ -44,11 +44,12 @@ public class GameManager : MonoBehaviour
 
     [Header("아이템 종류, 확률")]
     [SerializeField] List <GameObject> ItemKind;//아이템 종류
-    [SerializeField] List <GameObject> WeaponKind;//아이템 종류
+    [SerializeField] public List <GameObject> WeaponKind;//아이템 종류
     [SerializeField] List <GameObject> buffKind;//아이템 종류
     [SerializeField, Range(0.0f, 100f)] float IteamProbability;//외부에서 조정 가능
     //bool imItem = false;//아이템 생성 여부
     [SerializeField] Transform creatItemTab;
+    public int WeaponKindNmber;
     int priority = 0;
 
     [Header("스킬 버튼")]
@@ -350,35 +351,35 @@ public class GameManager : MonoBehaviour
     public void CreateItemProbability(Vector3 trs)
     {
         float randam = Random.Range(0f, 100f);
-        if (IteamProbability > randam) 
+        if (IteamProbability > randam)
         {
             float randamKind = Random.Range(0f, 2f);
-            if (randamKind == 0) 
+            if (randamKind == 0)
             {
                 CreateItem(trs, ItemKind, out int value);
-                IteamProbability = 0.0f;
+                //IteamProbability = 0.0f;
             }
             else if (randamKind > 0)
             {
                 if (priority < 2)//우선도 설정
                 {
-                    CreateItem(trs, WeaponKind, out int number);
+                    CreateItem(trs, WeaponKind, out WeaponKindNmber);
                     priority += 1;
-                    WeaponKind.RemoveAt(number);//지우기
+                    //WeaponKind.RemoveAt(number);//지우기
+                    //IteamProbability = 0.0f;
                     return;
                 }
 
                 CreateItem(trs, buffKind, out int value);
-                IteamProbability = 0.0f;
+                //IteamProbability = 0.0f;
             }
-            else //확률업
-            {
-                if (WeaponKind == null) { IteamProbability += 0.5f; }
-                else { IteamProbability += 2f; } 
-            }
+            
+        }
+        else //확률업
+        {
+            IteamProbability += 1f;
         }
 
-        
     }
     /// <summary>
     /// 아이템 생성
@@ -391,33 +392,28 @@ public class GameManager : MonoBehaviour
         int count = obj.Count;
         int Number = Random.Range(0, count);
 
-        GameObject go = Instantiate(WeaponKind[Number],
+        GameObject go = Instantiate(obj[Number],
             trs, Quaternion.identity, creatItemTab);
-        IteamProbability = 0.0f;
-        value = Number;
+        IteamProbability = 0.0f;//확률
+        value = Number;//무기종류 한정 사용
     }
     public void rankCheck()
     {
-        List<UserData> listUserData =
+        List<UserData> userData =
            JsonConvert.DeserializeObject<List<UserData>>
            (PlayerPrefs.GetString(RankIn.rankKey));
 
+        //while (userData.Count < RankIn.rankCount)//단순 박복문
+        //{
+        //    userData.Add(new UserData() { Name = "None", Score = 0 });
+        //}
 
         int rank = -1;
-        if(listUserData.Count < RankIn.rankCount) 
-        {
-            while (listUserData.Count < RankIn.rankCount)//단순 박복문
-            {
-                listUserData.Add(new UserData() { Name = "None", Score = 0 });
-
-            }
-        }
-        int count = listUserData.Count;
-        
+        int count = userData.Count;
         for (int iNum = 0; iNum < count; iNum++) 
         {
-            UserData userDate = listUserData[iNum];
-            if (userDate.Score<score) 
+            UserData userDate = userData[iNum];
+            if (userDate.Score < score) 
             {
                 rank = iNum;
                 break;
@@ -450,9 +446,9 @@ public class GameManager : MonoBehaviour
                 newRank.Score = score;
                 newRank.Name = name;
 
-                listUserData.Insert(rank, newRank);
-                listUserData.RemoveAt(listUserData.Count - 1);
-                string value = JsonConvert.SerializeObject(listUserData);
+                userData.Insert(rank, newRank);
+                userData.RemoveAt(userData.Count - 1);
+                string value = JsonConvert.SerializeObject(userData);
                 PlayerPrefs.SetString((RankIn.rankKey), value);
             }
 

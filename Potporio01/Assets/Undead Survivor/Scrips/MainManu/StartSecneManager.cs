@@ -58,9 +58,15 @@ public class StartSecneManager : MonoBehaviour
                 listUserData.Add(new UserData() { Name = "None", Score = 0 });
             }
             string vale = JsonConvert.SerializeObject(listUserData);
-            PlayerPrefs.GetString(RankIn.rankKey, vale);
+            PlayerPrefs.SetString(RankIn.rankKey, vale);
 
         }
+        //while (listUserData.Count < RankIn.rankCount)//단순 박복문
+        //{
+        //    listUserData.Add(new UserData() { Name = "None", Score = 0 });
+
+        //}
+
         int count = listUserData.Count; 
         for (int iNum = 0; iNum < count; ++iNum)
         {

@@ -147,7 +147,6 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            //SkillRunTimer = 0;
             SkillCoolTimer = 0;
             CodeOn = true;
             moving = true;
@@ -188,14 +187,15 @@ public class Enemy : MonoBehaviour
             GameObject go = Instantiate(WhithWeapon, trspos,
                 Quaternion.identity, gameManager.CreatTab);
             moving = false;
+            
         }
         else 
         {
-            SkillRunTimer += Time.deltaTime;
-            if (SkillRunTimer > SkillRunTime) 
+            SkillCoolTimer += Time.deltaTime;
+            if (SkillCoolTimer > SkillCoolTime) 
             {
-                SkillRunTimer = 0f;
                 moving = true;
+                SkillCoolTimer = 0.0f;
             }
         }
         
@@ -239,18 +239,18 @@ public class Enemy : MonoBehaviour
     }
     private void deathCheck()
     {
+        anim.SetBool("Hit", true);
         if (mobHP <= 0)
         {
             anim.SetBool("Death", true);
-            deathTimer += Time.deltaTime;//애니메이션 재생시간
+            gameManager.mobSpowncount -= 1;
             gameManager.CreateItemProbability(transform.position);
             gameManager.ScorePluse(score);
             Invoke("destroy", 0.4f); 
         }
         else 
         {
-            anim.SetBool("Hit", true);
-            Invoke("DefaultSprite", 0.3f);
+            anim.SetBool("Hit", false);
         }
 
     }
