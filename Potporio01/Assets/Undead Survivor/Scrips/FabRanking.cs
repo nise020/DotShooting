@@ -13,6 +13,6 @@ public class FabRanking : MonoBehaviour
     {
         textRank.text = _rank;
         textName.text = _name;
-        textScore.text = _score.ToString("d8");
+        textScore.text = _score.ToString("d6");
     }
 }

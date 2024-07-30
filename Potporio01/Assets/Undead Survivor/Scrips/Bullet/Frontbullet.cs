@@ -7,6 +7,7 @@ public class Frontbullet : MonoBehaviour
 {
     GameManager gameManager;
     Transform trspos;
+    float Speed = 5f;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,7 +40,7 @@ public class Frontbullet : MonoBehaviour
     }
     public void shoot()
     {
-        trspos.position += Vector3.right * 4.0f * Time.deltaTime;
+        trspos.position += Vector3.right * Speed * Time.deltaTime;
     }
 
 }

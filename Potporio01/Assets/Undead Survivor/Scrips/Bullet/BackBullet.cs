@@ -6,6 +6,7 @@ public class BackBullet : MonoBehaviour
 {
     GameManager gameManager;
     Transform trspos;
+    float Speed = 5f;
     // Start is called before the first frame update
     void Start()
     {
@@ -38,6 +39,6 @@ public class BackBullet : MonoBehaviour
     }
     public void shoot()//앞뒤로 왔다 갔다 함
     {
-        trspos.position += Vector3.left * 4.0f * Time.deltaTime;
+        trspos.position += Vector3.left * Speed * Time.deltaTime;
     }
 }

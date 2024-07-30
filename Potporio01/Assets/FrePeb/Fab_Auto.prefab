@@ -51,7 +51,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 9924b5cf93c4e51449264233ab0f028a, type: 3}
   - {fileID: 21300000, guid: dabd267d331a999459a380be8b483f59, type: 3}
   - {fileID: 21300000, guid: 746ff8127959f56409987cce7f198c81, type: 3}
-  UpgaidBool: 0
+  weaponSpriteRd: {fileID: 0}
+  UpGraidBool: 0
   swordUpgraidcount: 0
   weaponSpriteListCount: 0
   swordUpgraidMaxcount: 3
@@ -171,7 +172,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.086595014}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -182,5 +183,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.3, y: 1}
+  m_Size: {x: 0.3, y: 0.82681}
   m_EdgeRadius: 0

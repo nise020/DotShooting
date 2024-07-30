@@ -11,6 +11,7 @@ public class OppositionBullet : MonoBehaviour
     Vector3 enPos;
     Vector3 trsPos;
     Vector3 plPos;
+    Transform[] entrs;
     int bulletDamage = 1;
     bool on = true;
 
@@ -30,8 +31,6 @@ public class OppositionBullet : MonoBehaviour
         gameManager = GameManager.Instance;
         gameManager.PlayerTrsPosiTion(out plPos);
         enemy = FindObjectOfType<Enemy>();
-       // playerStatas = FindObjectOfType<PlayerStatas>();
-       // gameManager = GameManager.Instance;
 
         trsPos = transform.position;
         enPos = enemy.transform.position;
@@ -46,7 +45,7 @@ public class OppositionBullet : MonoBehaviour
     public void BulletposRotation() //총알방향 회전
     {
         if (on == false) { return; }
-        if (on==true) 
+        if (on == true) 
         {
             Vector2 defolt = enPos - trsPos;
             float angle = Mathf.Atan2(defolt.y, defolt.x) * Mathf.Rad2Deg;

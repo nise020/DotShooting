@@ -1,16 +1,30 @@
-using System;
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 
 public class NewBehaviourScript : MonoBehaviour//메모용
 {
     Camera cam;
     [SerializeField] BoxCollider2D coll;
-    [SerializeField] Transform trsPlayer;
+    [SerializeField] Transform trsPlayer;//
     Bounds curBound;
+    public enum enumData
+
+    {
+        Skull,
+        Defolt,
+        White,
+
+    }
+    //[SerializeField] enumData Type;//몹 타입
     private void Start()
     {
+        int enumcount = System.Enum.GetValues(typeof(enumData)).Length;
+        int randNum = Random.Range(0, 4);
+        enumData randEnum = (enumData)randNum;//enum 데이터를 int데이터를 활용해서 랜덤으로 부여
+
         cam =Camera.main;
         CheckBound();
     }

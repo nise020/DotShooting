@@ -16,9 +16,9 @@ public class AutoWeaponDron : MonoBehaviour
     [SerializeField] List<GameObject> swords;//검
     //int[] numbers = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     [SerializeField] public bool UpGraidBool = false;//검 이미지 변신 여부
-    public int swordUpgraidcount = 1;
-    public int weaponSpriteListCount = 0;
-    public int swordUpgraidMaxcount = 3;
+    int swordUpgraidcount = 0;
+    int weaponSpriteListCount = 0;
+    int swordUpgraidMaxcount = 3;
     //Image 
 
     private void Awake()

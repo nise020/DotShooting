@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class SkillBullet : MonoBehaviour
 {
     GameManager gameManager;
-    float Speed = 5f;
+    float Speed = 8f;
     private void Start()
     {
         gameManager = GameManager.Instance;

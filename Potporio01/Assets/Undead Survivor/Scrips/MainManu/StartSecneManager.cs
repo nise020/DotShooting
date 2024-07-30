@@ -23,33 +23,40 @@ public class StartSecneManager : MonoBehaviour
     [SerializeField] Button QietBut;
     [SerializeField] Button RankQietBut;
     [SerializeField] GameObject viewRanking;
+    [SerializeField] GameObject Fadeobj;
 
     [Header("랭크 프리팹")]
     [SerializeField] GameObject fadRank;//랭크 프리팹
+    [SerializeField] GameObject TitleName;//제목
     [SerializeField] Transform contents;//생성탭
     //Vertex vertex;
     private void Awake()
     {
         RankIn.isStating = true;
-
+        Fadeobj.SetActive(true);
         startBut.onClick.AddListener(gameStart);
         RankingBut.onClick.AddListener(showRanking);
-        RankQietBut.onClick.AddListener(() => { viewRanking.SetActive(false); });
+        RankQietBut.onClick.AddListener(reTurnManu);
         QietBut.onClick.AddListener(gameExit);
         initRankView();
         viewRanking.SetActive(false);
     }
+    private void reTurnManu() 
+    {
+        viewRanking.SetActive(false);
+        TitleName.SetActive(true);
 
+    }
     private void initRankView()
     {
         List<UserData> listUserData = null;
         clearRankView();
-        if (PlayerPrefs.HasKey(RankIn.rankKey) == true)//랭크 데이터가 저장이 되어있었다면
+        if (PlayerPrefs.HasKey(RankIn.rankKey) == true)//랭킹 데이터가 저장이 되어있었다면
         {
             listUserData = JsonConvert.DeserializeObject<List<UserData>>
                 (PlayerPrefs.GetString(RankIn.rankKey));
         }
-        else//랭크데이터가 저장되어 있지 않았다면
+        else//랭킹 데이터가 없을때
         {
             listUserData = new List<UserData>();
             int rankCount = RankIn.rankCount;
@@ -61,11 +68,7 @@ public class StartSecneManager : MonoBehaviour
             PlayerPrefs.SetString(RankIn.rankKey, vale);
 
         }
-        //while (listUserData.Count < RankIn.rankCount)//단순 박복문
-        //{
-        //    listUserData.Add(new UserData() { Name = "None", Score = 0 });
 
-        //}
 
         int count = listUserData.Count; 
         for (int iNum = 0; iNum < count; ++iNum)
@@ -78,7 +81,7 @@ public class StartSecneManager : MonoBehaviour
         }
         
     }
-    private void clearRankView()
+    private void clearRankView()//랭크를 항상 10개 유지
     {
         int count = contents.childCount;
         for (int iNum = count - 1; iNum > -1; --iNum)
@@ -88,10 +91,11 @@ public class StartSecneManager : MonoBehaviour
     }
     private void showRanking()
     {
+        TitleName.SetActive(false);
         viewRanking.SetActive(true);
     }
 
-    private void gameExit()
+    private void gameExit()//게임씬에서 종료
     {
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
@@ -107,7 +111,6 @@ Application.Quit();
             SceneManager.LoadScene(1);
             FaidInOut.Instance.ActiveFade(false, null);
         });
-        //FaidInOut.Instance.faid = true;
     }
 
 

@@ -2,18 +2,45 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 public class Item : MonoBehaviour
 {
-
-    private void OnTriggerEnter2D(Collider2D collision)
+    GameManager gameManager;
+    public enum ItemType
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+        Sword,
+        Heal,
+        SpeedUp,
+        OpGun,
+        MaxHpUp,
+        SwordPluse,
+        SwordScaleUP,
+        SwordUgraid,
+        BoundGun,
+    }
+    float timer = 0;
+    [SerializeField] public ItemType Type;//¸÷ Å¸ÀÔ
+    //[SerializeField] Image Itemimage;
+    SpriteRenderer SpriteRenderer;
+    private void Start()
+    {
+        gameManager = GameManager.Instance;
+        SpriteRenderer = GetComponent<SpriteRenderer>();
+    }
+    private void Update()
+    {
+        timer += Time.deltaTime;
+        if (timer > 30f) 
         {
             Destroy(gameObject);
         }
-
     }
-
+ 
+    public string GetItenType(out string name) 
+    {
+        name = Type.ToString();
+        return name;
+    }
 }

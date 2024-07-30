@@ -20,7 +20,6 @@ public class Enemy : MonoBehaviour
     }
     [SerializeField] MobTag Type;//몹 타입
 
-    Weapon weapon;
     GameManager gameManager;
     Transform MobTrnspos;
     float beforeX;
@@ -51,18 +50,19 @@ public class Enemy : MonoBehaviour
     [SerializeField] bool moving = false;
     bool skillChasing = false;
     float skillChasingTimer =0f;
-
+    TrailRenderer skullTrailRenderer;
 
     [Header("파괴시 점수")]
     [SerializeField] int score;
     Vector3 trspos;
-
+    CapsuleCollider2D Capcollider;
     private void Awake()
     {
         gameManager = GameManager.Instance;
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         defolteSprit = spriteRenderer.color;
+        Capcollider = GetComponent<CapsuleCollider2D>();
     }
     private void Start()
     {
@@ -75,7 +75,7 @@ public class Enemy : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Sword"))
         {
-            weapon = collision.gameObject.GetComponent<Weapon>();
+           Weapon weapon = collision.gameObject.GetComponent<Weapon>();
 
             if (weapon != null) 
             {
@@ -90,30 +90,29 @@ public class Enemy : MonoBehaviour
             mobHP -= 1;
             deathCheck();
         }
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
-        {
-            //moving = false;
-        }
     }
     private void Update()
     {
         if (gameManager.objStop == true) { return; }
-        if (playerStatas==null) { return; }
+        if (playerStatas == null) { return; }
         mobPattern();
         seeCheack();
     }
     private void pluse() //생성시 체력 확인
     {
         mobHP = mobHP + gameManager.PluseHp;
+        moveSpeed = moveSpeed + gameManager.PluseHp;
     }
     private void mobPattern()
     {
         if (Type == MobTag.Defolt) 
         {
-            Mobmoving(true);
+            Mobmoving(CodeOn);
         }
         else if (Type == MobTag.Skull)
         {
+            skullTrailRenderer = GetComponent<TrailRenderer>();
+            skullTrailRenderer.enabled = false;
             Mobmoving(CodeOn);
             Patern();
         }
@@ -128,7 +127,7 @@ public class Enemy : MonoBehaviour
     {
         gameManager.PlayerTrsPosiTion(out Vector3 playerPos);//출력용
         Vector3 defolt = playerPos - transform.position;
-        if (Vector3.Distance(playerPos , transform.position) < 2.0f)
+        if (Vector3.Distance(playerPos , transform.position) < 1.5f)
         { 
             CodeOn = false;
             if (FatenOn == true)
@@ -147,7 +146,6 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            SkillCoolTimer = 0;
             CodeOn = true;
             moving = true;
             FatenOn = true;
@@ -158,12 +156,15 @@ public class Enemy : MonoBehaviour
     {
         if (moving == true)
         {
+            skullTrailRenderer.enabled = true;
             Vector3 direction = defolt - transform.position;
             transform.position += (direction * 2 * Time.deltaTime);
             SkillRunTimer += Time.deltaTime;
             if (SkillRunTimer > SkillRunTime)
             {
+                SkillRunTimer = 0f;
                 moving = false;
+                skullTrailRenderer.enabled = false;
             }
         }
         else 
@@ -172,7 +173,6 @@ public class Enemy : MonoBehaviour
             if (SkillCoolTimer > SkillCoolTime)
             {
                 FatenOn = true;
-                SkillRunTimer = 0f;
                 SkillCoolTimer = 0f;
                 moving = true;
             }
@@ -239,9 +239,14 @@ public class Enemy : MonoBehaviour
     }
     private void deathCheck()
     {
-        anim.SetBool("Hit", true);
+        
         if (mobHP <= 0)
         {
+            Capcollider.enabled = false;
+            if (Type != MobTag.Defolt) //스킬 발동 멈추기
+            {
+                Type = MobTag.Defolt;
+            }
             anim.SetBool("Death", true);
             gameManager.mobSpowncount -= 1;
             gameManager.CreateItemProbability(transform.position);
@@ -250,15 +255,11 @@ public class Enemy : MonoBehaviour
         }
         else 
         {
-            anim.SetBool("Hit", false);
+            anim.SetTrigger("Hit");
         }
 
     }
 
-    private void DefaultSprite()
-    {
-        anim.SetBool("Hit", false);
-    }
     private void destroy() 
     {
         Destroy(gameObject);

@@ -1,8 +1,8 @@
 using Newtonsoft.Json;
+using OpenCover.Framework.Model;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -13,43 +13,41 @@ public class GameManager : MonoBehaviour
     Enemy enemy;
     Item item;
     AutoWeaponDron AutoWeaponDron;
-    //PlayerStatas playerStatas;
-    
-    //PlayerStatas player;
-    //public PlayerStatas _Player
-    //{
-    //    get { return player; }
-    //    set { player = value; }
-    //}
+
     public static GameManager Instance;
 
     [Header("플레이어 위치")]
     [SerializeField] public Transform trsTarget;
+    [SerializeField] GameObject player;
 
     [Header("몬스터 생성")]
     [SerializeField] public List<GameObject> mobList;//몹 리스트
     [SerializeField] public List<Transform> mobTrs;//몹 상태
     [SerializeField] public Transform CreatTab;//생성탭
-    [SerializeField] List<Vector2> createLine;
+    [SerializeField] public List<Vector2> createLine;
     public bool MobstatasUp = false;
     public int PluseHp = 0;
+    public float PluseSpeed = 0;
     GameObject mob;
-     public int mobSpowncount = 0;
+    public int mobSpowncount = 0;
     int mobSpownMaxcount = 8;
-
+    public GameObject[] mobName;
 
     [Header("적 생성시간")]
     float mobSpawnTimer = 0.0f;// 타이머
     [SerializeField, Range(0.1f, 5f)] float mobSpawnTime = 1.0f;
 
     [Header("아이템 종류, 확률")]
-    [SerializeField] List <GameObject> ItemKind;//아이템 종류
+    [SerializeField] List <GameObject> itemType;//아이템 타입
+    [SerializeField] public List <GameObject> ItemKind;//아이템 종류
     [SerializeField] public List <GameObject> WeaponKind;//아이템 종류
-    [SerializeField] List <GameObject> buffKind;//아이템 종류
+    [SerializeField] public List <GameObject> buffKind;//아이템 종류
     [SerializeField, Range(0.0f, 100f)] float IteamProbability;//외부에서 조정 가능
     //bool imItem = false;//아이템 생성 여부
     [SerializeField] Transform creatItemTab;
+    public int itemKindNmber;
     public int WeaponKindNmber;
+    public int buffKindNmber;
     int priority = 0;
 
     [Header("스킬 버튼")]
@@ -75,6 +73,10 @@ public class GameManager : MonoBehaviour
     int score = 0;
 
     [Header("게임오버메뉴")]
+    [SerializeField] Image backGround;
+    [SerializeField] Image textDead;
+    public bool deadOn = false;
+    public bool colordead = true;
     [SerializeField] GameObject objGameOverMenu;
     [SerializeField] TMP_Text GameOverMenuScoreText;
     [SerializeField] TMP_Text GameOverMenuRankText;
@@ -85,7 +87,7 @@ public class GameManager : MonoBehaviour
     [Header("게임 시작 안내")]
     [SerializeField] TMP_Text textStart;
     bool GameStart = false;
-    bool on = true;
+    bool Starton = true;
 
     [Header("일시정지")]
     [SerializeField] Button StopBtn;
@@ -94,7 +96,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] Button exitBtn;
     [SerializeField] public bool objStop = false;
 
-
+    [Header("아이템 설명")]
+    [SerializeField] public Image Itemimage;
+    [SerializeField] public TMP_Text ItemText;
+    Color becolor;
     private void Awake()
     {
         if (RankIn.isStating == false)//메뉴에서 시작 하기
@@ -114,10 +119,14 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        //playerStatas = FindObjectOfType<PlayerStatas>();
+        textStart.gameObject.SetActive(true);
         Color color = textStart.color;
         color.a = 0f;
         textStart.color = color;
+        textDead.color = color;
+
+        becolor = Itemimage.color;
+        //ItemText.color;
 
         skillbtn.onClick.AddListener(skillOn);
         skillbtn.interactable = false;
@@ -128,8 +137,124 @@ public class GameManager : MonoBehaviour
         StopBtn.onClick.AddListener(StopBtnOn);
         continuBtn.onClick.AddListener(continuBtnOn);
         exitBtn.onClick.AddListener(exitGame);
-        //skillImg.rectTransform.position.x = 60f;
-        //skillImg.rectTransform.position = new Vector2(60,0);
+    }
+    public void Tooltip(string name) 
+    {
+        if (name == "Sword") 
+        {
+            PlayerStatas playerStatas = player.GetComponent<PlayerStatas>();
+            if (playerStatas.DropSword == false) 
+            {
+                ItemText.text = $"Auto Sword을 획득하셨습니다";
+            }
+            else { ItemText.text = $"이미 획득하셨습니다"; }
+            
+        }
+        else if (name == "OpGun")
+        {
+            PlayerStatas playerStatas = player.GetComponent<PlayerStatas>();
+            if (playerStatas.DropOpGun == false)
+            {
+                ItemText.text = $"Random Target Gun을 획득하셨습니다";
+            }
+            else { ItemText.text = $"이미 획득하셨습니다"; }
+             
+        }
+        else if (name == "BoundGun")
+        {
+            PlayerStatas playerStatas = player.GetComponent<PlayerStatas>();
+            if (playerStatas.DropBoundGun == false)
+            {
+                ItemText.text = $"Bound Gun을 획득하셨습니다";
+            }
+            else { ItemText.text = $"이미 획득하셨습니다"; }
+             
+        }
+        else if (name == "MaxHpUp") { ItemText.text = $"최대 체력이 증가 하였습니다"; }
+        else if (name == "Heal") 
+        {
+            PlayerStatas playerStatas  = player.GetComponent<PlayerStatas>();
+            if (playerStatas.NowHp <= playerStatas.MaximumHP)
+            {
+                ItemText.text = $"체력이 회복 되었습니다({playerStatas.NowHp}/{playerStatas.MaximumHP})";
+            }
+            else { ItemText.text = "더 이상 체력 회복이 불가합니다"; }
+        }
+        else if (name == "SpeedUp") 
+        {
+            MoveControll moveControll = player.GetComponent<MoveControll>();
+            if (moveControll.moveSpeed < moveControll.MaxiumSpeed) 
+            {
+                ItemText.text = $"이동속도가 증가 하였습니다({moveControll.moveSpeed}/{moveControll.MaxiumSpeed})"; 
+            }
+            else { ItemText.text = "이동속도가 최대치의 도달했습니다"; }
+        }
+        else if (name == "SwordPluse") 
+        {
+            AttakProces attakProces = player.GetComponent<AttakProces>();
+            if (attakProces.swordPlusecount < attakProces.swordPluseMaxcount)
+            {
+                ItemText.text = $"검의 갯수가 증가 하였습니다({attakProces.swordPlusecount}/{attakProces.swordPluseMaxcount})";
+            }
+            else { ItemText.text = "검의 갯수가 최대치의 도달했습니다"; } 
+        }
+        else if (name == "SwordUgraid") 
+        {
+            AttakProces attakProces = player.GetComponent<AttakProces>();
+            if (attakProces.swordUpgraidcount < attakProces.swordUpgraidMaxcount)
+            {
+                ItemText.text = $"검의 Level이 증가 하였습니다({attakProces.swordUpgraidcount}/{attakProces.swordUpgraidMaxcount})";
+            }
+            else { ItemText.text = "Level이 최대치의 도달했습니다"; }
+        }
+        else if (name == "SwordScaleUP")
+        {
+            AttakProces attakProces = player.GetComponent<AttakProces>();
+            if (attakProces.swordScalecount < attakProces.swordScaleMaxcount)
+            {
+                ItemText.text = $"검의 크기가 증가 하였습니다({attakProces.swordScalecount}/{attakProces.swordScaleMaxcount})";
+            }
+            else { ItemText.text = "검의 크기가 최대치의 도달했습니다"; }
+        }
+        Itemimage.color = becolor;
+        ItemText.color = becolor;
+
+        Itemimage.gameObject.SetActive(true);
+        ItemText.gameObject.SetActive(true);
+
+    }
+    private void TooltipColor() 
+    {
+        if (ItemText.gameObject.activeSelf) 
+        {
+            Color color2 = ItemText.color;
+            color2.a -= Time.deltaTime / 3f;
+            ItemText.color = color2;
+            if (ItemText.color.a < 0)
+            {
+                ItemText.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            Color color1 = Itemimage.color;
+            color1.a -= Time.deltaTime / 2f;
+            Itemimage.color = color1;
+            if (Itemimage.color.a < 0)
+            {
+                Itemimage.gameObject.SetActive(false);
+            }
+        }
+        
+
+    }
+
+    private void ItemTextTime() 
+    {
+        if (Itemimage.gameObject.activeSelf)//오브젝트가 켜져 있으면
+        {
+            TooltipColor();
+        }
     }
     private void continuBtnOn()
     {
@@ -154,13 +279,15 @@ public class GameManager : MonoBehaviour
     }
     private void Update()
     {
-        if (objStop==true) { return; }
+        dead(deadOn);
+        if (objStop == true) { return; }
         gameStart();
         if (GameStart == false) {return; }
         runTime();
         skiilCool();
         createEnemy();//활성화 필요
-        
+        ItemTextTime();
+
     }
     private void skillOn() 
     {
@@ -192,7 +319,7 @@ public class GameManager : MonoBehaviour
 
     private void skiilCool()//스킬 쿨 타임 조절
     {
-        if (skillbtn.interactable == true || trsTarget == null) { return; }
+        if (skillbtn.interactable == true || trsTarget == null || skillImg == null) { return; }
 
         if (skillbtn.interactable == false)//타이머 등 수정필요
         {
@@ -206,7 +333,6 @@ public class GameManager : MonoBehaviour
             {
                 SkillCoolStart();
                 skillImg.fillAmount -= Time.deltaTime / skillBulletTime;
-                //skillImg.fillAmount = 1 - skillBulletTimer / skillBulletTime;
             }
             else//skillBulletOn == false,스킬 Off
             {
@@ -231,7 +357,7 @@ public class GameManager : MonoBehaviour
     private void gameStart()//게임 시작
     {
         if (textStart == null) { return; }
-        if (on == true)
+        if (Starton == true)
         {
             Color color = textStart.color;
             color.a += Time.deltaTime/ 1.0f;
@@ -239,7 +365,7 @@ public class GameManager : MonoBehaviour
             if (color.a > 1)
             {
                 color.a = 1f;
-                on = false;
+                Starton = false;
             }
         }
         else
@@ -260,7 +386,38 @@ public class GameManager : MonoBehaviour
         }
         
     }
-
+    private void dead(bool value) 
+    {
+        if (value == false || textDead == null) { return; }
+        backGround.gameObject.SetActive(true);
+        if (colordead == true)
+        {
+            Color color = textDead.color;
+            color.a += Time.deltaTime / 1.0f;
+            textDead.color = color;
+            if (color.a > 1)
+            {
+                color.a = 1f;
+                colordead = false;
+            }
+        }
+        else
+        {
+            Color color = textDead.color;
+            color.a -= Time.deltaTime / 1.0f;
+            textDead.color = color;
+            if (color.a < 0)
+            {
+                color.a = 0f;
+            }
+        }
+        if (textDead.color.a <= 0)
+        {
+            Destroy(textDead.gameObject);
+            rankCheck();
+            value = true;
+        }
+    }
     public void ScorePluse(int number)//점수 증가
     {
         score += number;
@@ -279,8 +436,9 @@ public class GameManager : MonoBehaviour
             minuteTimer = 0;
             hour += 1;
             PluseHp += 1;
-            mobSpawnTime -= 0.2f;
-            mobSpownMaxcount += 3;
+            PluseSpeed += 0.5f;
+            mobSpawnTime -= 0.3f;
+            mobSpownMaxcount += 5;
         }
     }
 
@@ -337,9 +495,6 @@ public class GameManager : MonoBehaviour
             int mobiRoad = Random.Range(0, mobcount);
 
             mob = Instantiate(mobList[mobiRoad], done, Quaternion.identity, CreatTab);
-            //Enemy enemy = mob.GetComponent<Enemy>();
-            //enemy.pluse();
-
         }
     }
 
@@ -353,34 +508,34 @@ public class GameManager : MonoBehaviour
         float randam = Random.Range(0f, 100f);
         if (IteamProbability > randam)
         {
-            float randamKind = Random.Range(0f, 2f);
-            if (randamKind == 0)
+            int randamKind = Random.Range(0, 2);
+            if (randamKind == 0f)
             {
-                CreateItem(trs, ItemKind, out int value);
-                //IteamProbability = 0.0f;
+                CreateItem(trs, ItemKind, out itemKindNmber);
             }
-            else if (randamKind > 0)
+            else if (randamKind == 1)
             {
-                if (priority < 2)//우선도 설정
+                if (WeaponKind.Count != 0)//우선도 설정
                 {
                     CreateItem(trs, WeaponKind, out WeaponKindNmber);
-                    priority += 1;
-                    //WeaponKind.RemoveAt(number);//지우기
-                    //IteamProbability = 0.0f;
-                    return;
                 }
-
-                CreateItem(trs, buffKind, out int value);
-                //IteamProbability = 0.0f;
-            }
-            
+                else 
+                {
+                    if (buffKind.Count != 0)
+                    {
+                        CreateItem(trs, buffKind, out buffKindNmber);
+                    }
+                    else { return; }
+                }  
+            }           
         }
         else //확률업
         {
-            IteamProbability += 1f;
+            IteamProbability += 0.5f;
         }
 
     }
+
     /// <summary>
     /// 아이템 생성
     /// </summary>
@@ -397,16 +552,12 @@ public class GameManager : MonoBehaviour
         IteamProbability = 0.0f;//확률
         value = Number;//무기종류 한정 사용
     }
+
     public void rankCheck()
     {
         List<UserData> userData =
            JsonConvert.DeserializeObject<List<UserData>>
            (PlayerPrefs.GetString(RankIn.rankKey));
-
-        //while (userData.Count < RankIn.rankCount)//단순 박복문
-        //{
-        //    userData.Add(new UserData() { Name = "None", Score = 0 });
-        //}
 
         int rank = -1;
         int count = userData.Count;
@@ -488,11 +639,6 @@ public class GameManager : MonoBehaviour
     {
         _pos = trsTarget.transform.position;
     }
-
-    //public void EnomyTrsPosiTion(out Vector3 _pos)
-    //{
-    //    _pos = mobList[1].transform.position;
-    //}
 
 
 }
