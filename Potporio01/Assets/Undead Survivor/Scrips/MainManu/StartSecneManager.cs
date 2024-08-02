@@ -10,11 +10,11 @@ using UnityEngine.UI;
 
 public class StartSecneManager : MonoBehaviour
 {
-    [SerializeField] Button Pushbut;
-    [SerializeField] Image butImage;
-    [SerializeField] TMP_Text startText;
-    float runningTimer = 0f;
-    float timer = 1.0f;
+    //[SerializeField] Button Pushbut;
+    //[SerializeField] Image butImage;
+    //[SerializeField] TMP_Text startText;
+    //float runningTimer = 0f;
+    //float timer = 1.0f;
     [SerializeField] bool on = false;
 
     [Header("실행 버튼")]
@@ -30,6 +30,11 @@ public class StartSecneManager : MonoBehaviour
     [SerializeField] GameObject TitleName;//제목
     [SerializeField] Transform contents;//생성탭
     //Vertex vertex;
+    [Header("실행 버튼")]
+    [SerializeField] GameObject ExitTab;
+    [SerializeField] Button Yes;
+    [SerializeField] Button No;
+
     private void Awake()
     {
         RankIn.isStating = true;
@@ -37,7 +42,10 @@ public class StartSecneManager : MonoBehaviour
         startBut.onClick.AddListener(gameStart);
         RankingBut.onClick.AddListener(showRanking);
         RankQietBut.onClick.AddListener(reTurnManu);
-        QietBut.onClick.AddListener(gameExit);
+        //QietBut.onClick.AddListener(gameExit);
+        QietBut.onClick.AddListener(() => ExitTab.SetActive(true));
+        Yes.onClick.AddListener(gameExit);
+        No.onClick.AddListener(()=> ExitTab.SetActive(false));
         initRankView();
         viewRanking.SetActive(false);
     }

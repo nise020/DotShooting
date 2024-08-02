@@ -14,7 +14,7 @@ public class OppositionBullet : MonoBehaviour
     Transform[] entrs;
     int bulletDamage = 1;
     bool on = true;
-
+    float moveSpeed = 3.0f;
     private void OnBecameInvisible()//카메라 밖에 사라졌을때
     {
         Destroy(gameObject);//수정 가능성 있음
@@ -54,13 +54,16 @@ public class OppositionBullet : MonoBehaviour
             // Mathf.Atan2는 x축 기준이다
         }
     }
-      
+    public void SppedUP(float value)
+    {
+        moveSpeed = value + moveSpeed;
+    }
     private void BulletposSpeed()
     {
         if (plPos == null) { return; }
         //GameObject go = Random.Range(0, count);
         Vector3 distance = (enPos - trsPos).normalized;
-        transform.position += distance * 5.0f * Time.deltaTime;
+        transform.position += distance * moveSpeed * Time.deltaTime;
     }
     public void BulletdeamageCheack(out int _iNum)//<-class Enemy
     {

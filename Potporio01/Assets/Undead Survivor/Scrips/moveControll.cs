@@ -11,12 +11,13 @@ public class MoveControll : MonoBehaviour
     /// <summary>
     /// 플레이어 이동속도(버프 부여 가능)
     /// </summary>
-    [SerializeField] public float moveSpeed = 2.0f;
-    public float MaxiumSpeed = 6.0f;
+    public float moveSpeed = 2.0f;
+    public float MaxiumSpeed = 5.0f;
     Vector2 moveDir;
     Animator moveAnim;
     Rigidbody2D rigid;
     Transform trsPos;
+    BoxCollider2D boxCol2d;
 
     private void Awake()
     {
@@ -30,6 +31,7 @@ public class MoveControll : MonoBehaviour
     void Start()
     {
         rigid = GetComponent<Rigidbody2D>();
+        boxCol2d = GetComponent<BoxCollider2D>();
         moveAnim = transform.GetComponent<Animator>();
         gameManager = GameManager.Instance;
         playerStatas = GetComponent<PlayerStatas>();
@@ -38,18 +40,10 @@ public class MoveControll : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (gameManager.objStop == true) { return; }
-        playerMoving();
+        wellCheck();
+        playerMoving(gameManager.objStop);
         runAnim();
         seeCheack(); 
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Line"))//크기 증가
-        {
-            Debug.Log(111);
-        }
     }
 
     /// <summary>
@@ -73,17 +67,34 @@ public class MoveControll : MonoBehaviour
 
     }
 
+    private void wellCheck() 
+    {
+        RaycastHit2D hitup = Physics2D.BoxCast(boxCol2d.bounds.center, boxCol2d.bounds.size, 0, Vector2.up, 0.01f, LayerMask.NameToLayer("Line"));
+        RaycastHit2D hitdown = Physics2D.BoxCast(boxCol2d.bounds.center, boxCol2d.bounds.size, 0, Vector2.down, 0.01f, LayerMask.NameToLayer("Line"));
+        RaycastHit2D hitright = Physics2D.BoxCast(boxCol2d.bounds.center, boxCol2d.bounds.size, 0, Vector2.right, 0.01f, LayerMask.NameToLayer("Line"));
+        RaycastHit2D hitleft = Physics2D.BoxCast(boxCol2d.bounds.center, boxCol2d.bounds.size, 0, Vector2.left, 0.01f, LayerMask.NameToLayer("Line"));
+        if (hitup.collider != null ||
+            hitdown.collider != null ||
+            hitright.collider != null ||
+            hitleft.collider != null)
+        {
+            Vector2 rid = rigid.velocity;
+            rigid.velocity = rid;
+        }
+    }
     /// <summary>
     /// 방향키 입력시 움직이는 기능
     /// </summary>
-    private void playerMoving()//움직임 조절 가능
+    public void playerMoving(bool value)//움직임 조절 가능
     {
         if (playerStatas.NowHp <= 0) { return; }
-        moveDir.x = Input.GetAxisRaw("Horizontal") * moveSpeed;// -1 0 1
-        moveDir.y = Input.GetAxisRaw("Vertical") * moveSpeed;// -1 0 1
+        if (value == true) { return; }
+        moveDir.x = Input.GetAxisRaw("Horizontal"); // -1 0 1
+        moveDir.y = Input.GetAxisRaw("Vertical");// -1 0 1
 
-        rigid.velocity = moveDir;
-
+        rigid.velocity = moveDir.normalized * moveSpeed;
+        //rigid.MovePosition(moveDir * moveSpeed);
+        //OverlapBox
 
     }
 

@@ -32,7 +32,7 @@ public class Item : MonoBehaviour
     private void Update()
     {
         timer += Time.deltaTime;
-        if (timer > 30f) 
+        if (timer > 10f) 
         {
             Destroy(gameObject);
         }

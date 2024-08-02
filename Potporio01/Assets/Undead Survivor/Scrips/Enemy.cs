@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Net.NetworkInformation;
@@ -36,6 +37,9 @@ public class Enemy : MonoBehaviour
     [SerializeField] Sprite hitImg;
     Color defolteSprit;
     SpriteRenderer spriteRenderer;
+    bool Hitcolor=false;
+    float HitTimer = 0f;
+    float HitTime = 0.1f;
     
     [Header("몬스터 스킬")]
     float SkillCoolTimer = 0f;
@@ -48,6 +52,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] GameObject WhithWeapon;
     [SerializeField] bool CodeOn = true;
     [SerializeField] bool moving = false;
+    [SerializeField] bool seeCheck = false;
     bool skillChasing = false;
     float skillChasingTimer =0f;
     TrailRenderer skullTrailRenderer;
@@ -79,16 +84,44 @@ public class Enemy : MonoBehaviour
 
             if (weapon != null) 
             {
+                Hitcolor = true;
+                hit(Hitcolor);
                 weapon.WeapondeamageCheack(out int damage);
                 mobHP -= damage;
                 deathCheck();
             }
-            
         }
         if (collision.gameObject.layer == LayerMask.NameToLayer("Bullet"))
         {
+            Hitcolor = true;
+            hit(Hitcolor);
             mobHP -= 1;
             deathCheck();
+        }
+    }
+
+    private void hit(bool value)
+    {
+        if (value==false) { return; }
+        Color color = spriteRenderer.color;
+        if (value == true) 
+        {
+            spriteRenderer.color = Color.red;
+        }
+        
+    }
+    private void Beforsprit() 
+    {
+        if (Hitcolor == false) { return; }
+        if (Hitcolor == true) 
+        {
+            HitTimer += Time.deltaTime;
+            if (HitTimer > HitTime)
+            {
+                spriteRenderer.color = defolteSprit;
+                HitTimer = 0f;
+                Hitcolor = false;
+            }
         }
     }
     private void Update()
@@ -97,17 +130,19 @@ public class Enemy : MonoBehaviour
         if (playerStatas == null) { return; }
         mobPattern();
         seeCheack();
+        Beforsprit();
     }
     private void pluse() //생성시 체력 확인
     {
         mobHP = mobHP + gameManager.PluseHp;
-        moveSpeed = moveSpeed + gameManager.PluseHp;
+        moveSpeed = moveSpeed + gameManager.PluseSpeed;
     }
     private void mobPattern()
     {
         if (Type == MobTag.Defolt) 
         {
             Mobmoving(CodeOn);
+            seeCheck = true;
         }
         else if (Type == MobTag.Skull)
         {
@@ -139,13 +174,14 @@ public class Enemy : MonoBehaviour
             {
                 SkullSkill(FatenPos);
             }
-            else
+            else if(Type == MobTag.White)
             {
                 WhiteSkill();
             }
         }
         else
         {
+            seeCheck = true;
             CodeOn = true;
             moving = true;
             FatenOn = true;
@@ -156,9 +192,10 @@ public class Enemy : MonoBehaviour
     {
         if (moving == true)
         {
+            seeCheck = false;
             skullTrailRenderer.enabled = true;
             Vector3 direction = defolt - transform.position;
-            transform.position += (direction * 2 * Time.deltaTime);
+            transform.position += (direction.normalized * (2f + gameManager.PluseSpeed) * Time.deltaTime);
             SkillRunTimer += Time.deltaTime;
             if (SkillRunTimer > SkillRunTime)
             {
@@ -172,6 +209,7 @@ public class Enemy : MonoBehaviour
             SkillCoolTimer += Time.deltaTime;
             if (SkillCoolTimer > SkillCoolTime)
             {
+                seeCheck = false;
                 FatenOn = true;
                 SkillCoolTimer = 0f;
                 moving = true;
@@ -184,15 +222,17 @@ public class Enemy : MonoBehaviour
         if (moving == true)
         {
             Vector3 trspos = transform.position;//내 위치
-            GameObject go = Instantiate(WhithWeapon, trspos,
+            GameObject go = Instantiate(WhithWeapon, transform.position,
                 Quaternion.identity, gameManager.CreatTab);
+            MobBullet gosc = go.GetComponent<MobBullet>();
+            gosc.SppedUP(moveSpeed);
             moving = false;
             
         }
         else 
         {
             SkillCoolTimer += Time.deltaTime;
-            if (SkillCoolTimer > SkillCoolTime) 
+            if (SkillCoolTimer > SkillCoolTime + 1.0) 
             {
                 moving = true;
                 SkillCoolTimer = 0.0f;
@@ -222,6 +262,7 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private void seeCheack()
     {
+        if (seeCheck == false) { return; }
         Vector3 scale = MobTrnspos.localScale;
         float affterX = MobTrnspos.position.x;
        
@@ -239,15 +280,14 @@ public class Enemy : MonoBehaviour
     }
     private void deathCheck()
     {
-        
         if (mobHP <= 0)
         {
+            anim.SetBool("Death", true);
             Capcollider.enabled = false;
             if (Type != MobTag.Defolt) //스킬 발동 멈추기
             {
                 Type = MobTag.Defolt;
             }
-            anim.SetBool("Death", true);
             gameManager.mobSpowncount -= 1;
             gameManager.CreateItemProbability(transform.position);
             gameManager.ScorePluse(score);
@@ -255,7 +295,7 @@ public class Enemy : MonoBehaviour
         }
         else 
         {
-            anim.SetTrigger("Hit");
+            //anim.SetTrigger("Hit");
         }
 
     }

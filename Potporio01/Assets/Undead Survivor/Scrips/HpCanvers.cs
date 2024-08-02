@@ -10,6 +10,7 @@ public class HpCanvers : MonoBehaviour
     PlayerStatas playerStatas;
     GameManager gameManager;
     Transform childtrs;
+    RectTransform rectTransform;
     //float nowHP;
     //float maxHP;
     private void Awake()
@@ -18,6 +19,7 @@ public class HpCanvers : MonoBehaviour
     }
     private void Start()
     {
+        rectTransform = this.GetComponent<RectTransform>();
         gameManager = GameManager.Instance;
         playerStatas = FindObjectOfType<PlayerStatas>();
 
@@ -37,8 +39,15 @@ public class HpCanvers : MonoBehaviour
     {
         if (playerStatas == null) { return; }
         gameManager.PlayerTrsPosiTion(out Vector3 pos);
-        pos.y += 1;
-        transform.position = pos;  
+        pos = pos + Vector3.up;
+        rectTransform.anchoredPosition = pos;
+        //transform.localPosition = pos;
+        //transform.position = pos;
+        //Vector3 screenPos = Camera.main.WorldToScreenPoint(pos);
+        //Debug.Log("Screen Position: " + screenPos);
+        // RectTransform을 통해 화면 좌표로 설정
+        //RectTransform value = GetComponent<RectTransform>();
+        //value.position = screenPos;s
     }
     public void HpBar()
     {

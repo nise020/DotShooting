@@ -6,10 +6,11 @@ public class BackBullet : MonoBehaviour
 {
     GameManager gameManager;
     Transform trspos;
-    float Speed = 5f;
+    float Speed = 3f;
     // Start is called before the first frame update
     void Start()
     {
+        //Speed = Speed;
         trspos = transform;
         gameManager = GameManager.Instance;
     }
@@ -36,6 +37,10 @@ public class BackBullet : MonoBehaviour
         age = Mathf.Abs(age);
         transform.localRotation = Quaternion.Euler(0, 0, age);
         shoot();
+    }
+    public void SppedUP(float value)
+    {
+        Speed = value + Speed;
     }
     public void shoot()//앞뒤로 왔다 갔다 함
     {

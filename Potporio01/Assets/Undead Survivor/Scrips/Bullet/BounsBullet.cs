@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 public class BounsBullet : MonoBehaviour
 {
     float Speed = 8f;
-    GameManager gamemanager;
+    GameManager gameManager;
     float roution = -140f;
     float routionEuler = 45f;
     float runTimer = 0f;
@@ -26,11 +26,12 @@ public class BounsBullet : MonoBehaviour
     }
     void Start()
     {
-        gamemanager = GameManager.Instance;
+        gameManager = GameManager.Instance;
         transform.rotation = Quaternion.Euler(0, 0, routionEuler);
     }
     void Update()
     {
+        if (gameManager.objStop == true) { return; }
         transform.position += transform.up * Speed * Time.deltaTime;
 
         runTimer += Time.deltaTime;

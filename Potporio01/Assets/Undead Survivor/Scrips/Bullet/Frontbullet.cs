@@ -7,7 +7,7 @@ public class Frontbullet : MonoBehaviour
 {
     GameManager gameManager;
     Transform trspos;
-    float Speed = 5f;
+    float Speed = 3f;
     // Start is called before the first frame update
     void Start()
     {
@@ -37,6 +37,10 @@ public class Frontbullet : MonoBehaviour
         age = -Mathf.Abs(age);
         transform.localRotation = Quaternion.Euler(0, 0, age);
         shoot();
+    }
+    public void SppedUP(float value)
+    {
+        Speed = value + Speed;
     }
     public void shoot()
     {

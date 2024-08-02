@@ -13,6 +13,7 @@ public class MobBullet : MonoBehaviour
     SpriteRenderer spriteRenderer;
     float runtimer = 0f;
     float runtime = 3f;
+    float moveSpeed = 2.0f;
     bool on = true;
     private void Awake()
     {
@@ -70,11 +71,14 @@ public class MobBullet : MonoBehaviour
             spriteRenderer.color = color;
         }
     }
-
+    public void SppedUP(float value)
+    {
+        moveSpeed = value;
+    }
     private void BulletposSpeed()
     {
         Vector3 distance = (plPos - trsPos).normalized;
-        transform.position += distance * 1.0f * Time.deltaTime;
+        transform.position += distance.normalized * (moveSpeed) * Time.deltaTime;
     }
 
 }

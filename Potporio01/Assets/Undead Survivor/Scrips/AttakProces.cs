@@ -9,7 +9,7 @@ public class AttakProces : MonoBehaviour
     Transform playertransPos;
     PlayerStatas playerStatas;
     GameManager gameManager;
-
+    MoveControll moveControll;
     [Header("자동 공격")]
     bool autoCheack = false;//확인용
     float autoTime = 3f;
@@ -49,6 +49,7 @@ public class AttakProces : MonoBehaviour
     {
         playerStatas = GetComponent<PlayerStatas>();
         playertransPos = GetComponent<Transform>();
+        moveControll = GetComponent<MoveControll>();
     }
     private void Start()
     {
@@ -68,8 +69,9 @@ public class AttakProces : MonoBehaviour
             {
                 weaponScale();
                 swordScalecount += 1;
+                if (swordScalecount == swordScaleMaxcount) { gameManager.buffKind.RemoveAt(gameManager.buffKindNmber); }
             }
-            else { gameManager.buffKind.RemoveAt(gameManager.buffKindNmber); }
+
             DropSwordScaleUP = false;
             gameManager.Tooltip(name);
             Destroy(collision.gameObject);
@@ -83,8 +85,9 @@ public class AttakProces : MonoBehaviour
                 Swordcount += 1;
                 autoObj[Swordcount].SetActive(true);
                 swordPlusecount += 1;
+                if (swordPlusecount == swordPluseMaxcount) { gameManager.buffKind.RemoveAt(gameManager.buffKindNmber); }
             }
-            else { gameManager.buffKind.RemoveAt(gameManager.buffKindNmber); }
+
             gameManager.Tooltip(name);
             Destroy(collision.gameObject);
         }
@@ -99,8 +102,9 @@ public class AttakProces : MonoBehaviour
                 autoWeaponDron.weaponUpgraid();
                 autoObj[Swordcount].SetActive(false);
                 swordUpgraidcount += 1;
+                if (swordUpgraidcount == swordUpgraidMaxcount) { gameManager.buffKind.RemoveAt(gameManager.buffKindNmber); }
             }
-            else { gameManager.buffKind.RemoveAt(gameManager.buffKindNmber); }
+
             gameManager.Tooltip(name);
             Destroy(collision.gameObject);
         }
@@ -205,11 +209,15 @@ public class AttakProces : MonoBehaviour
         {
             GameObject go = Instantiate(bulletKind[1], ShootPos.position,
             Quaternion.identity, creatTab.transform);
+            Frontbullet gosc = go.GetComponent<Frontbullet>();
+            gosc.SppedUP(moveControll.moveSpeed);
         }
         else if(transform.lossyScale.x == -1) 
         {
             GameObject go = Instantiate(bulletKind[2], ShootPos.position,
             Quaternion.identity, creatTab.transform);
+            BackBullet gosc = go.GetComponent<BackBullet>();
+            gosc.SppedUP(moveControll.moveSpeed);
         }
         
     }
@@ -228,10 +236,12 @@ public class AttakProces : MonoBehaviour
     {
         enemy = FindObjectOfType<Enemy>();
         if (enemy == null) { return; }//몹이 없을때 사용 안함
-        if (playerStatas.DropOpGun==true) 
+        if (playerStatas.DropOpGun == true) 
         {
             GameObject go = Instantiate(bulletKind[0], ShootPos.position,
             Quaternion.identity, creatTab.transform);
+            OppositionBullet gosc = go.GetComponent<OppositionBullet>();
+            gosc.SppedUP(moveControll.moveSpeed);
         }
         
     }

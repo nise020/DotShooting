@@ -32,6 +32,7 @@ public class PlayerStatas : MonoBehaviour
 
     private void Awake()
     {
+        beforHp = MaximumHP;
         NowHp = MaximumHP;
     }
     private void Start()
@@ -76,6 +77,7 @@ public class PlayerStatas : MonoBehaviour
             item.GetItenType(out name);
             if (NowHp < MaximumHP)//Èú+
             {
+                beforHp=NowHp;
                 NowHp += 1;
             }
             gameManager.Tooltip(name);
@@ -88,8 +90,9 @@ public class PlayerStatas : MonoBehaviour
             if (moveControll.MaxiumSpeed > moveControll.moveSpeed)
             {
                 moveControll.moveSpeed += 0.5f;
+                if (moveControll.MaxiumSpeed == moveControll.moveSpeed) { gameManager.ItemKind.RemoveAt(gameManager.itemKindNmber); }
             }
-            else { gameManager.ItemKind.RemoveAt(gameManager.itemKindNmber); }
+
             gameManager.Tooltip(name);
             Destroy(collision.gameObject);
         }
@@ -110,7 +113,7 @@ public class PlayerStatas : MonoBehaviour
             item.GetItenType(out name);
             if (DropBoundGun == false)
             {
-                gameManager.Tooltip(name);
+               gameManager.Tooltip(name);
                 DropBoundGun = true;
                 gameManager.WeaponKind.RemoveAt(gameManager.WeaponKindNmber);
             }
